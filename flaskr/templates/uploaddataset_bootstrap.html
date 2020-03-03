@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Upload Dataset</title>
+	<meta name="viewport" content="width = device-width, initial-scale=1.0">
+	<link href="../static/css/bootstrap.min.css" rel="stylesheet">
+	<meta charset="UTF-8">
+	<style>
+		.page-header {
+				background-color: green;
+		}
+		body { 
+			background-color: black;
+			color: white;
+			font-size: 15px;
+		}
+		#header {
+				background-color: #9f5ec3;
+				border-radius: 20px;
+		}
+		#form {
+				background-color: #9f5ec3;
+				border-radius: 25px;
+		}
+		
+	</style>
+	<script src="../static/scripts/validatecsv.js"></script>		
+</head>
+<body>
+<div class="page-header">
+	<br><center><h2>Upload a Dataset</h2></center><br>
+</div>
+		
+	
+<br>
+<div class="container" id="header">
+	<br><center>
+			<p class="lead">Upload a <i><u>CSV</i></u> file containing data to run algorithm on.<br>
+			do not worry, some parts and attributes will be checked by us,<br> other parts can be checked by you.
+			That will make the file fit for algorithm to run on.</p></center>
+	</center><br>
+</div>
+<br><br>
+<div class="container" id="form">
+	<br><br><br>
+	<div class="row">
+		<div class="col-md-6">
+			<form name="form1" method="post" enctype="multipart/form-data">
+				<input type="file" name="dataset" class="required"/><br>
+				<button type="button" class="btn btn-primary">Submit</button>
+			</form>
+		</div>
+	</div>
+	<br><br>
+	<a href="https://en.wikipedia.org/wiki/Data_set"><img src="https://https://miro.medium.com/max/810/1*8AQibku9uGSpQSRI6W6DHg.png" /></a>
+	<button class="btn btn-info">Dashboard</button>
+	<br><br>
+</div>
+</body>
+</html>
