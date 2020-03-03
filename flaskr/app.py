@@ -1,5 +1,6 @@
-import os
-from flask import Flask,request
+from flask import (
+    Flask, render_template, request
+)
 
 # create the app
 app = Flask(__name__)
