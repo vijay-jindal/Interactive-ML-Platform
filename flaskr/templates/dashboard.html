@@ -2,11 +2,66 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>InteractiveML</title>
-	<link href="bootstrap.css" rel="stylesheet" >
-<style>
-</style>
+	<meta name="viewport" content="width = device-width, initial-scale=1.0">
+	<link href="../static/css/bootstrap.min.css" rel="stylesheet">
+	<meta charset="UTF-8">
+	<center><h1> Welcome to InteractiveML Platform </h1></center>
+	<style>
+			body {
+				background-color: white;
+				color: black;
+				font-size: 15px;
+			}
+			a {
+  text-decoration: none;
+  display: inline-block;
+  padding: 8px 16px;
+}
+
+a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.previous {
+  background-color: #f1f1f1;
+  color: black;
+}
+
+.next {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.round {
+  border-radius: 50%;
+}
+	</style>
+	<div class="page-header">
+		<title>InteractiveML</title>
+	</div>
 </head>
+
 <body>
+	<div class="container" id="form">
+
+			<h2> Steps involved here: </h2>
+			<h6> <tr>1. Choose a name for your project. </h6>
+			<h6> <tr>2. Uppload a dataset for the project. </h6>
+			<h6> 3. Choose Hyperparameter. </h6>
+<br><br>
+	<div id="project name">
+		<form method="post"> <!-- Change the action value and respective value based on backend -->
+					<label for="project-name">Project Name: </label>
+					<input type="text" id="project-name" name="project-name"><br><br>
+					<button type="reset" value="Reset">Reset</button>
+					<button type="save" value="save">Save</button>
+	</div>
+
+<br><br>
+	<div id="next">
+	<center>	<a href="./upload-csv.html" class="next">Next &raquo;</a></center>
+  </div>
+	</div>
 </body>
 </html>
