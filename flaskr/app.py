@@ -1,29 +1,56 @@
 from flask import (
     Flask, render_template, request,
     jsonify)
+from services import pre_process, algorithm_select, hyperparameter_select
 
-
-from services import pre_process
-# create the app
 app = Flask(__name__)
 
 
 @app.route('/')
-def hello():
-
-    return "Welcome to Interactive ML platform! Please create a project"
-   #return render_template('template_name.html')
+def welcome():
+    return render_template('dashboard.html')
 
 
-@app.route('/newproject',methods=['POST','GET'])
-def newproject():
+@app.route('/project', methods=['POST', 'GET'])
+def project():
     if request.method == 'GET':
-        return "Enter project Name and select the Dataset"
+        return render_template('upload-csv.html')
 
     if request.method == 'POST':
-        datasetPath = request.form['path']
-        proectName = request.form['project_name']
-        return pre_process.main(datasetPath,proectName)
+        try:
+            dataset_path = request.form['dataset_path']
+            project_name = request.form['project_name']
+            target_feature = request.form['target_feature']
+            return pre_process.main(dataset_path, project_name, target_feature)
+        except:
+            return "Invalid Parameters"
+
+
+@app.route('/algorithm', methods=['POST', 'GET'])
+def algorithm():
+    if request.method == 'GET':
+        return "Select the Algorithm"
+
+    if request.method == 'POST':
+        try:
+            algorithm_name = request.form['algorithm_name']
+            return algorithm_select.getHyperparameters(algorithm_name)
+        except:
+            return "Invalid Parameters"
+
+
+@app.route('/hyperparameter', methods=['POST', 'GET'])
+def hyperparameterUpdate():
+    if request.method == 'GET':
+        return "Enter values for Hyperparameters"
+
+    if request.method == 'POST':
+        try:
+            algorithm_name = request.form['algorithm_name']
+            hyperparameters_data = request.form['hyperparameters']
+            return hyperparameter_select.updateHyperparameters(algorithm_name, hyperparameters_data)
+        except:
+            return "Invalid Parameters"
 
 
 if __name__ == '__main__':
