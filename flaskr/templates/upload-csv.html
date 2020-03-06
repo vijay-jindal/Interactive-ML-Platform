@@ -1,0 +1,80 @@
+<!doctype html>
+<head>
+  <title>Interactive ML-Platform</title>
+	<style>
+        	body {
+        	  height: 100%;
+        	}
+
+        	html {
+        	  display: table;
+        	  margin: auto;
+        	}
+
+        	body {
+        	  display: table-cell;
+        	  vertical-align: middle;
+        	}
+	</style>
+
+
+</head>
+
+<body>
+        	<center><h3>Kindly Select the column that has the desiered output:</h3></center>
+
+        	<br>
+          <p align="center">
+              <input type="file" id="input-file" accept=".csv">
+          </p>
+          <div id="handsontable-container"></div>
+
+          <script src="https://cdn.jsdelivr.net/handsontable/0.28.4/handsontable.full.min.js"></script>
+          <script src="https://cdn.jsdelivr.net/npm/papaparse@5"></script>
+          <script>
+        					var input = document.getElementById('input-file')
+        					var handsontableContainer = document.getElementById('handsontable-container')
+
+        					input.onchange = function () {
+          					var file = this.files[0]
+          					var reader = new FileReader()
+
+        					  reader.onload = function (e) {
+        					  var csv = e.target.result
+        					  var data = Papa.parse(csv, {
+        					      header: true,
+        					      skipEmptyLines: true
+        					  })
+
+        					    // reset container
+      					    handsontableContainer.innerHTML = ''
+      					    handsontableContainer.className = ''
+
+      					    Handsontable(handsontableContainer, {
+      					      data: data.data,
+      					      rowHeaders: true,
+      					      colHeaders: data.meta.fields,
+      					      columnSorting: true
+      					    })
+        					  }
+
+        					  reader.readAsText(file)
+        					}
+        	</script>
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/handsontable/0.28.4/handsontable.full.min.css">
+          </div>
+
+          <div id="input-column">
+          <center> <h3> Please enter the column number where your desired output is: </h3></center>
+          <br><center>
+
+          <form action="./processing.php" method="post"> <!-- Change the action value and respective value based on backend -->
+                <label for="column-number">Column Number: </label>
+                <input type="number" id="column-number" name="column-number"><br><br>
+                <button type="submit" value="Submit">Submit</button>
+                <button type="reset" value="Reset">Reset</button>
+          </form></center></div>
+
+
+</body>
+</html>
