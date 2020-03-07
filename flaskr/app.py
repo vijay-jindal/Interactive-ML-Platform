@@ -11,6 +11,8 @@ app = Flask(__name__)
     Output:
             GET : Dashboard.html
 '''
+
+
 @app.route('/')
 def welcome():
     return render_template('dashboard.html')
@@ -24,6 +26,8 @@ def welcome():
             GET  : upload-csv.html + project name + target variable
             POST : Processed Dataset path, null exceptions, dataset exceptions, etc.
 '''
+
+
 @app.route('/project', methods=['POST', 'GET'])
 def project():
     if request.method == 'GET':
@@ -46,6 +50,8 @@ def project():
             GET  : Select algorithm page
             POST : List of Hyperparameters for that algorithm with default values
 '''
+
+
 @app.route('/algorithm', methods=['POST', 'GET'])
 def algorithm():
     if request.method == 'GET':
@@ -61,10 +67,19 @@ def algorithm():
 '''
     Input :
             POST : algorithm_name as a String and hyperparameters as a JSON object
+            Input Format :
+                        algorithm_name : Support_Vector_Machine
+                        hyperparameters : {"SVM": true,"criterion": "mse","max_depth": null,"max_features": "auto",
+                        "max_leaf_nodes": null ,"min_impurity_decrease": 0.0, "min_impurity_split": null,
+                        "min_samples_leaf": 1,"min_samples_split": 2,  "min_weight_fraction_leaf": 0.0,
+                        "n_estimators": 10, "n_jobs": 1, "oob_score": false,"random_state": 42, "verbose": 0,
+                        "warm_start": false}
     Output:
             POST : Page to ask for training and testing dataset split ratio and
             other additional inputs and then run the algorithms.
 '''
+
+
 @app.route('/hyperparameter', methods=['POST'])
 def hyperparameterUpdate():
     if request.method == 'GET':
