@@ -25,7 +25,7 @@
         	  vertical-align: middle;
         	}
 	</style>
-
+<center><h3>Project name : {{ Project_name }}</h3></center>
 
 </head>
 
@@ -38,8 +38,8 @@
           </p>
           <div id="handsontable-container"></div>
 
-          <script src="https://cdn.jsdelivr.net/handsontable/0.28.4/handsontable.full.min.js"></script>
-          <script src="https://cdn.jsdelivr.net/npm/papaparse@5"></script>
+          <script src="../static/scripts/upload-csv1.js"></script>
+          <script src="../static/scripts/upload-csv2.js"></script>
           <script>
         					var input = document.getElementById('input-file')
         					var handsontableContainer = document.getElementById('handsontable-container')
@@ -70,7 +70,7 @@
         					  reader.readAsText(file)
         					}
         	</script>
-          <link rel="stylesheet" href="https://cdn.jsdelivr.net/handsontable/0.28.4/handsontable.full.min.css">
+          <link rel="stylesheet" href="../static/css/upload-csv3.css">
           </div>
 
           <div id="input-column">
