@@ -9,35 +9,35 @@
 	<br><br><br><br><br><br>
 	<center><h1>Interactive ML-Platform </h1></center>
 	<style>
-	/*	body {
+		body {
 				background-color: white;
 				color: black;
 				font-size: 15px;
 			}
 			a {
-  text-decoration: none;
-  display: inline-block;
-  padding: 8px 16px;
-}
+  				text-decoration: none;
+  				display: inline-block;
+  				padding: 8px 16px;
+			}
 
-a:hover {
-  background-color: #ddd;
-  color: black;
-}
+			a:hover {
+  				background-color: #ddd;
+  				color: black;
+			}
 
-.previous {
-  background-color: #f1f1f1;
-  color: black;
-}
+			.previous {
+  				background-color: #f1f1f1;
+  				color: black;
+			}
 
-.next {
-  background-color: #4CAF50;
-  color: white;
-}
+			.next {
+  				background-color: #4CAF50;
+  				color: white;
+			}
 
-.round {
-  border-radius: 50%;
-} */
+			.round {
+  				border-radius: 50%;
+			} 
 	</style>
 	<div class="page-header">
 		<title>InteractiveML</title>
@@ -55,13 +55,14 @@ a:hover {
 <br><br>
 	<div id="project name">
 		<center>
-		<form method="post"> <!-- Change the action value and respective value based on backend -->
+		<form method="post" action="http://localhost:5000/upload-csv" enctype="multipart/form-data"> <!-- Change the action value and respective value based on backend -->
 				<!--	<label for="project-name">Project Name: </label> -->
-					<input type="text" id="project_name" name="project_name" placeholder="Project Name"><a href="upload-csv.html" class="button">Next </a>
+					<input type="text" id="project_name" name="project_name" placeholder="Project Name">
+					<button type="submit">Next &raquo</a>
 				</center>
 			<!--		<button type="reset" value="Reset">Reset</button>
 					<button type="save" value="save">Save</button> -->
-
+		</form>
 <!--	</div>
 
 	<div id="next"> -->

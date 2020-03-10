@@ -7,9 +7,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return "Welcome to Interactive ML platform! Please create a project"
-   #return render_template('template_name.html')
-
+   #return "Welcome to Interactive ML platform! Please create a project"
+   return render_template('dashboard.html')
+@app.route('/upload-csv',methods=['POST'])
+def uplcsv():
+	return render_template('upload-csv.html',Project_name=request.form.get('project_name'))
 @app.route('/newproject',methods=['POST','GET'])
 def newproject():
     if request.method == 'GET':
