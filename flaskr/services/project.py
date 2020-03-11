@@ -1,5 +1,6 @@
 from datetime import datetime
 import os,tempfile
+from services.dataset import Dataset
 
 class Project:
     """docstring for Project."""
@@ -17,3 +18,4 @@ class Project:
         dpath = os.path.join(self.path,dataset.filename)
         dataset.save(dpath)
         self.app.logger.info("Uploaded Dataset to "+ dpath)
+        self.dataset = Dataset(self.app,dpath)

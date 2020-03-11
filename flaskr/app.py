@@ -45,9 +45,12 @@ def upload(project_name):
 @app.route('/project/<project_name>/preprocess')
 def preprocess(project_name):
     if request.method == 'GET':
-        if hasattr(project,"name") and project_name == getattr(project,"name"):
-            return "WIP"
-            # return render_template('preprocess.html')
+        if hasattr(project,"name") and project_name == getattr(project,"name") and hasattr(project,"dataset"):
+            column_names,data_types = project.dataset.info()
+            app.logger.info(column_names)
+            app.logger.info(data_types)
+            app.logger.info(project.dataset.path)
+            return render_template('preprocess.html',path=project.dataset.path,column_names=column_names,data_types=data_types)
         else:
             return redirect('/')
     return "WIP"
