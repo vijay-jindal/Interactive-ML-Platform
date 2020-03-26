@@ -1,4 +1,28 @@
-IMLP <br>
-<label for="project-name">Project Name: </label>
-<input type="text" id="project-name" name="project-name"><br><br>
-<button type="submit" value="Submit" onclick='window.location.href="project/".concat(document.getElementById("project-name").value);'>Submit</button>
+<html>
+<head>
+	<link rel="stylesheet" href="../static/css/button.css">
+  <link rel="stylesheet" href="../static/css/input-style.css">
+<!-- IDEA:   <link rel="stylesheet" href="../static/css/dark-theme.css"> -->
+	<meta charset="UTF-8">
+<!--- <li class="w3-theme-d5"> -->
+	<br><br><br><br><br><br>
+	<center><h1>Interactive ML-Platform </h1></center>
+  <br><br><br><br><br><br>
+
+
+  <div class="page-header">
+    <title>InteractiveML</title>
+  </div>
+</head>
+
+<body>
+  <div id="w3-container w3-orange">
+    <form class="w3-container" method="post" action="http://localhost:5000/project" enctype="multipart/form-data">
+    	<input class="w3-input" type="text" id="project-name" name="project-name"><br>
+    	<label for="project-name">Project Name</label> <br><br>
+    	<input type="submit" value="Submit" />
+    </form>
+  </div>
+  </body>
+<!-- IDEA:</li>  -->
+<html>
