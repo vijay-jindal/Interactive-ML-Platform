@@ -1,7 +1,24 @@
 <html>
 <head>
+	<style>
+	body {
+	  background-image: url('../static/resources/background.png');
+	  background-repeat: no-repeat;
+	  background-attachment: fixed;
+	  background-size: 100% 100%;
+	}
+	input[type=text] {
+		width: 100%;
+	  padding: 12px 20px;
+	  margin: 8px 0;
+	  box-sizing: border-box;
+	  border: none;
+	  border-bottom: 2px solid white;
+		background: transparent
+	}
+	</style>
 	<link rel="stylesheet" href="../static/css/button.css">
-  <link rel="stylesheet" href="../static/css/input-style.css">
+  <!--<link rel="stylesheet" href="../static/css/input-style.css">-->
 <!-- IDEA:   <link rel="stylesheet" href="../static/css/dark-theme.css"> -->
 	<meta charset="UTF-8">
 <!--- <li class="w3-theme-d5"> -->
@@ -17,11 +34,11 @@
 
 <body>
   <div id="w3-container w3-orange">
-    <form class="w3-container" method="post" action="http://localhost:5000/project" enctype="multipart/form-data">
-    	<input class="w3-input" type="text" id="project-name" name="project-name"><br>
-    	<label for="project-name">Project Name</label> <br><br>
-    	<input type="submit" value="Submit" />
+    <form class="w3-container">
+    <input class="input" type="text" id="project-name" name="project-name"><br>
+    <label for="project-name">Project Name</label> <br><br>
     </form>
+    <center><button class="button" type="submit" value="Submit" onclick='window.location.href="project/".concat(document.getElementById("project-name").value);'>Submit</button>
   </div>
   </body>
 <!-- IDEA:</li>  -->

@@ -7,23 +7,20 @@
 	<center><h1>Interactive ML-Platform </h1></center>
   <br><br><br><br><br><br>
 
- <div class="page-header">
+
+  <div class="page-header">
     <title>InteractiveML</title>
   </div>
 </head>
-<br>
- <div id="project_name_display">
-	<center><h3>Project Name: {{ proj_name }}</h3></center>
- </div>
 
 <body>
   <div id="upload_dataset">
   <center>  Upload a Dataset <br><br><br><br><br><br>
-  <form class="w3-input" name="form1" method="POST" action="http://localhost:5000/preprocess" enctype="multipart/form-data">
+  <form class="w3-input" name="form1" id="upload_dataset" method="post" enctype="multipart/form-data">
   <input type="file" name="dataset" class="required"/><br><br><br>
-  <input type="submit" value="Submit" />
-  </form>
+  <button class="button" type="submit" value="Submit">Submit</button>
   </center>
+  </form>
   </div>
   </body>
 
