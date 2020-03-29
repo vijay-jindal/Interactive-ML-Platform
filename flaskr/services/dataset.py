@@ -10,3 +10,7 @@ class Dataset:
 
     def info(self):
         return (self.df.columns,self.df.dtypes)
+
+    def set_features(self, list):
+    # self.X = select columns matching the list from dataframe and store it
+        return

@@ -1,6 +1,7 @@
 from datetime import datetime
 import os,tempfile
 from services.dataset import Dataset
+from services.model import Model
 
 class Project:
     """docstring for Project."""
@@ -19,3 +20,6 @@ class Project:
         dataset.save(dpath)
         self.app.logger.info("Uploaded Dataset to "+ dpath)
         self.dataset = Dataset(self.app,dpath)
+        
+    def create_model(self, name):
+        self.model = Model(self.app, self.dataset, name)

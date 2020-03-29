@@ -50,7 +50,22 @@ def preprocess(project_name):
             app.logger.info(column_names)
             app.logger.info(data_types)
             app.logger.info(project.dataset.path)
+            # From frontend get the following
+            # Type of learning (supervised or unsupervised)
+            # Algorithm Name
+            # Based on learning type get list of columns as features and target variable
             return render_template('preprocess.html',path=project.dataset.path,column_names=column_names,data_types=data_types)
+        else:
+            return redirect('/')
+    return "WIP"
+
+@app.route('/project/<project_name>/model')
+def model(project_name):
+    if request.method == 'GET':
+        if hasattr(project,"name") and project_name == getattr(project,"name") and hasattr(project,"dataset"):
+            # create model with algo name
+            project.create_model("RandomForestClassifier")
+            return project.model.get_params()
         else:
             return redirect('/')
     return "WIP"
