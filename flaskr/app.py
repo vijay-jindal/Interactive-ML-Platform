@@ -50,7 +50,7 @@ def preprocess(project_name):
             app.logger.info(column_names)
             app.logger.info(data_types)
             app.logger.info(project.dataset.path)
-            return render_template('preprocess.html',path=project.dataset.path,column_names=column_names,data_types=data_types)
+            return render_template('preprocess.html',path=project.dataset.path,column_names=column_names,data_types=data_types,proj_name=project_name)
         else:
             return redirect('/')
     elif request.method == 'POST':
@@ -58,13 +58,19 @@ def preprocess(project_name):
         # Type of learning (supervised or unsupervised)
         # Algorithm Name
         # Based on learning type get list of columns as features and target variable
+        learn_method = request.form['Learn_Method']
+        algo = request.form['Algorithm']
+        bp = request.form['bp']
+        bgr = request.form['bgr']
+        sc = request.form['sc']
+        cls = request.form['class']
 
         # If supervised create a Model with algo name
         project.create_model("RandomForestClassifier")
 
         # Retrieve list of columns as features and target from POST request
-        X = ['bp','bgr','sc']
-        y = ['class']
+        X = [bp,bgr,sc]
+        y = cls
         project.dataset.set_features(X)
         project.dataset.set_target(y)
         return redirect('/project/'+project_name+'/model')
@@ -76,7 +82,7 @@ def model(project_name):
     if request.method == 'GET':
         if hasattr(project,"name") and project_name == getattr(project,"name") and hasattr(project,"dataset") and hasattr(project,"model"):
             # Send default parameters available for the model to frontend
-            return project.model.get_params()
+            return render_template('default_params.html',def_params=project.model.get_params())
         else:
             return redirect('/')
     elif request.method == 'POST':

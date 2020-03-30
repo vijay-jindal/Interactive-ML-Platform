@@ -3,6 +3,13 @@
 3. View column_names and their data types <br> {{column_names}} <br> {{data_types}} <br>
 4. Compulsory and Optional Checks in Preprocessing <br>
 5. Based on Learning type, display option to select target class <br>
-<form name="form1" method="post" enctype="multipart/form-data">
-<button type="submit" value="Submit">Submit</button>
+<form name="form1" method="post" action="http://localhost:5000/project/{{ proj_name }}/preprocess" enctype="multipart/form-data">
+	<input type="text" name="Learn_Method" placeholder="Supervised or Unsupervised" /><br>
+	<input type="text" name="Algorithm" placeholder="Algorithm" /><br>
+	<input type="text" name="bp" placeholder="bp" />
+	<input type="text" name="bgr" placeholder="bgr" />
+	<input type="text" name="sc" placeholder="sc" /><br>
+	<input type="text" name="class" placeholder="class" /><br>
+	<input type="submit" value="Submit" />
+</form>
 </form>

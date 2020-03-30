@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html>
+	<head><title>Model Training Params</title></head>
+	<body>
+		<table>
+		{% for key in def_params.keys() %}
+				<tr>
+					<td> {{ key }} </td>
+					<td><input type="text" value={{ def_params[key] }} name="{{ key }}" /></td>
+				</tr>
+		{% endfor %}
+		</table>
+	</body>
+</html>
+				 
+		   
+	
