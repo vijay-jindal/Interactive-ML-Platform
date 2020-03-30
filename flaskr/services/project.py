@@ -13,7 +13,6 @@ class Project:
         self.date_created = datetime.now()
         self.path = tempfile.mkdtemp() # Create a temporary directory and store the path
         self.app.logger.info("Project Name : " + self.name + "Date Created : " + str(self.date_created) + "Path : "+ self.path)
-        return project_name
 
     def upload_dataset(self, dataset):
         dpath = os.path.join(self.path,dataset.filename)
