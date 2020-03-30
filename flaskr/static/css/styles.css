@@ -42,6 +42,13 @@ border: none;
 border-bottom: 1px solid white;
 background: transparent;
 }
-.button{
-background: transparent;
+button {
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+    width: 30px;
+    height: 20px;
 }
