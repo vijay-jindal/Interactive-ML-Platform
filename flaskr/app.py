@@ -28,7 +28,7 @@ def new_project(project_name):
     project.create(project_name)
     return redirect('/project/'+project_name+'/upload')
 
-@app.route('/project/<project_name>/upload',methods=['GET','POST'])
+@app.route('/project/<project_name>/upload', methods=['GET','POST'])
 def upload(project_name):
     if request.method == 'GET':
         if hasattr(project,"name") and project_name == getattr(project,"name"):
@@ -36,13 +36,13 @@ def upload(project_name):
         else:
             return redirect('/')
     elif request.method == 'POST' and 'dataset' in request.files:
-        project.upload_dataset(request.files['dataset']) # allow only csv files in UI
+        project.upload_dataset(request.files['dataset']) # allow only csv files in UI and backend
         # TODO : create instance of dataset class
         return redirect('/project/'+project_name+'/preprocess')
     else:
         return redirect('/')
 
-@app.route('/project/<project_name>/preprocess')
+@app.route('/project/<project_name>/preprocess', methods=['GET','POST'])
 def preprocess(project_name):
     if request.method == 'GET':
         if hasattr(project,"name") and project_name == getattr(project,"name") and hasattr(project,"dataset"):
@@ -50,25 +50,54 @@ def preprocess(project_name):
             app.logger.info(column_names)
             app.logger.info(data_types)
             app.logger.info(project.dataset.path)
-            # From frontend get the following
-            # Type of learning (supervised or unsupervised)
-            # Algorithm Name
-            # Based on learning type get list of columns as features and target variable
             return render_template('preprocess.html',path=project.dataset.path,column_names=column_names,data_types=data_types)
         else:
             return redirect('/')
-    return "WIP"
+    elif request.method == 'POST':
+        # From frontend get the following
+        # Type of learning (supervised or unsupervised)
+        # Algorithm Name
+        # Based on learning type get list of columns as features and target variable
 
-@app.route('/project/<project_name>/model')
+        # If supervised create a Model with algo name
+        project.create_model("RandomForestClassifier")
+
+        # Retrieve list of columns as features and target from POST request
+        X = ['bp','bgr','sc']
+        y = ['class']
+        project.dataset.set_features(X)
+        project.dataset.set_target(y)
+        return redirect('/project/'+project_name+'/model')
+    else:
+        return redirect('/')
+
+@app.route('/project/<project_name>/model', methods=['GET','POST'])
 def model(project_name):
     if request.method == 'GET':
-        if hasattr(project,"name") and project_name == getattr(project,"name") and hasattr(project,"dataset"):
-            # create model with algo name
-            project.create_model("RandomForestClassifier")
+        if hasattr(project,"name") and project_name == getattr(project,"name") and hasattr(project,"dataset") and hasattr(project,"model"):
+            # Send default parameters available for the model to frontend
             return project.model.get_params()
         else:
             return redirect('/')
-    return "WIP"
+    elif request.method == 'POST':
+        # Get modified parameters in dictionary format and set them using set_params function
+        # get test data size ex: 0.20,0.30 etc
+        # 0.20 means 20% data will be for validation (test)
+        # Also consider possibility of complete training
+        # Show realtime messages from training (set verbose flag in model)
+        return redirect('/project/'+project_name+'/prediction')
+    else:
+        return redirect('/')
+
+@app.route('/project/<project_name>/prediction')
+def prediction(project_name):
+    # Show accuracy score
+    # Show confusion matrix
+    # Show classification report
+    # above to be shown from sklearn metrics
+    # Visualizations
+    return("Hi there {name}, this WIP".format(name="developer"))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
