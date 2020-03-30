@@ -37,6 +37,16 @@ input.file {
 	opacity: 0;
 	z-index: 2;
 }
+button {
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+    width: 30px;
+    height: 20px;
+}
 </style>
 
 <body>
@@ -61,7 +71,7 @@ NAME : {{project_name}}
 	______________________________________________ <br><br><br>
   <form class="w3-input" name="form1" id="upload_dataset" method="post" enctype="multipart/form-data">
   <input type="file" name="dataset" class="fileinputs">
-	<i class="far fa-arrow-alt-circle-right" value="submit" id="submit" type="submit" size="15px"></i>
+  <button type="submit" name="button" class="far fa-arrow-alt-circle-right"></button>
   </center>
   </form>
   </div>
