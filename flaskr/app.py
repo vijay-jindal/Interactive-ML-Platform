@@ -59,8 +59,8 @@ def preprocess(project_name):
         # Algorithm Name
         # Based on learning type get list of columns as features and target variable
         learn_method = request.form['Learn_Method']
-        algo = request.form['Algorithm']
-        
+        algo = request.form.get('Algorithm')
+        print(algo)        
 
         # If supervised create a Model with algo name
         project.create_model("RandomForestClassifier")

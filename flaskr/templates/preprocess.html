@@ -11,14 +11,16 @@
 			<br><b>Select the type of learning algorithm</b><br>
 			<input type="radio" name="Learn_Method">Supervised</input><br>
 			<input type="radio" name="Learn_Method">Unsupervised</input><br><br>
-			<input type="text" name="Algorithm" placeholder="Algorithm" /><br><br>
+			<select name="Algorithm">
+				<option value="RandomForestClassifier">RandomForestClassifier</option>
+			</select><br><br>
 			<b>Use the list below to select features. They will be preprocessed</b><br>
 			{% for col in column_names %}
-				<input type="checkbox" name="features" value="{{ col }}">{{ col }}</input><br>
+				<input type="checkbox" name="features" value="{{col}}">{{ col }}</input><br>
 			{% endfor %}	
 			<br><b>Use the list below to select the target class for prediction</b><br>
 			{% for col in column_names %}
-				<input type="checkbox" name="target" value="{{ col }}">{{col}}</input><br>
+				<input type="checkbox" name="target" value="{{col}}">{{col}}</input><br>
 			{% endfor %}
 			<br><input type="submit" value="Submit" />
 		</form>
