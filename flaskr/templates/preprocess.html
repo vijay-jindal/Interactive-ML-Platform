@@ -4,16 +4,27 @@
 	<script>
 		function dynamic() {
 			var supervised_part = document.getElementById("supervised");
+			supervised_part.style.visibility = "hidden";
+			document.getElementById('alg').style.visibility = "hidden";
+			document.getElementById('sub').style.visibility = "hidden";		
 			if (document.getElementById('slearn').checked == true) {
+				document.getElementById('alg').style.visibility = "visible";
 				document.getElementById('supervised').style.visibility = "visible";
+				document.getElementById('sub').style.visibility = "visible";
 				var alg = document.getElementById('alg');
 				alg[0].innerHTML = "Random Forest";
 				alg[0].setAttribute('value','RF');
-				alg[1].innerHTML = "Support Vector Machines";
-				alg[1].setAttribute('value','SVM');
+				if (!alg[1]) {
+					var option = document.createElement('option');
+					option.text = "Support Vector Machines";
+					document.getElementById('alg').add(option);
+					alg[1].setAttribute('value','SVM');
+				}
 			}
 			if (document.getElementById('ulearn').checked == true) {
+				document.getElementById('alg').style.visibility = "visible";
 				document.getElementById('supervised').style.visibility = "hidden";
+				document.getElementById('sub').style.visibility = "visible";
 				var alg = document.getElementById('alg');
 				alg[0].value="KM";
 				alg[0].innerHTML="K Means Clustering";
@@ -51,7 +62,7 @@
 					<input type="checkbox" name="target" value="{{col}}">{{col}}</input><br>
 				{% endfor %}
 			</div>
-			<br><input type="submit" value="Submit" />
+			<br><input type="submit" value="Submit" id="sub" />
 		</form>
 	</body>
 </html>
