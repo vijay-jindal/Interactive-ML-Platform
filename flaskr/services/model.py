@@ -1,7 +1,10 @@
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 
 class Model(object):
     """docstring for Model."""
+    Classifiers = {'RF': 'RandomForestClassifier', 'SVM':'SVC'}
+
     def __init__(self, app, dataset, name):
         self.app = app
         self.dataset = dataset

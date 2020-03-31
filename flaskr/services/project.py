@@ -20,6 +20,6 @@ class Project:
         dataset.save(dpath)
         self.app.logger.info("Uploaded Dataset to "+ dpath)
         self.dataset = Dataset(self.app,dpath)
-        
+
     def create_model(self, name):
-        self.model = Model(self.app, self.dataset, name)
+        self.model = Model(self.app, self.dataset, Model.Classifiers[name])

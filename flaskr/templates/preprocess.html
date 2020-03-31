@@ -9,15 +9,16 @@
 		5. Based on Learning type, display option to select target class <br>
 		<form name="form1" method="post" action="http://localhost:5000/project/{{ proj_name }}/preprocess" enctype="multipart/form-data">
 			<br><b>Select the type of learning algorithm</b><br>
-			<input type="radio" name="Learn_Method">Supervised</input><br>
-			<input type="radio" name="Learn_Method">Unsupervised</input><br><br>
+			<input type="radio" name="Learn_Method" value="Supervised">Supervised</input><br>
+			<input type="radio" name="Learn_Method" value="Unsupervised">Unsupervised</input><br><br>
 			<select name="Algorithm">
-				<option value="RandomForestClassifier">RandomForestClassifier</option>
+				<option value="RF">Random Forest</option>
+        <option value="SVM">Support Vector Machine</option>
 			</select><br><br>
 			<b>Use the list below to select features. They will be preprocessed</b><br>
 			{% for col in column_names %}
 				<input type="checkbox" name="features" value="{{col}}">{{ col }}</input><br>
-			{% endfor %}	
+			{% endfor %}
 			<br><b>Use the list below to select the target class for prediction</b><br>
 			{% for col in column_names %}
 				<input type="checkbox" name="target" value="{{col}}">{{col}}</input><br>

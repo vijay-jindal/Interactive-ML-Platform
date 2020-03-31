@@ -59,18 +59,22 @@ def preprocess(project_name):
         # Algorithm Name
         # Based on learning type get list of columns as features and target variable
         learn_method = request.form['Learn_Method']
-        algo = request.form.get('Algorithm')
-        print(algo)        
+        algo_name = request.form.get('Algorithm')
+        app.logger.info(learn_method + " " + algo_name)
 
-        # If supervised create a Model with algo name
-        project.create_model("RandomForestClassifier")
-
-        # Retrieve list of columns as features and target from POST request
-        X = request.form.getlist('features')
-        y = request.form.get('target')
-        project.dataset.set_features(X)
-        project.dataset.set_target(y)
-        return redirect('/project/'+project_name+'/model')
+        if learn_method == "Supervised":
+            # If supervised create a Model with algo name
+            project.create_model(algo_name)
+            # Retrieve list of columns as features and target from POST request
+            X = request.form.getlist('features')
+            y = request.form.get('target')
+            project.dataset.set_features(X)
+            project.dataset.set_target(y)
+            return redirect('/project/'+project_name+'/model')
+        elif learn_method == "Unsupervised":
+            return "WIP"
+        else:
+            return "WIP"
     else:
         return redirect('/')
 
