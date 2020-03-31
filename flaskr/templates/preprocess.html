@@ -1,7 +1,33 @@
 <!DOCTYPE HTML>
 <html>
-	<head><title>Preprocess</title></head>
-	<body>
+	<head><title>Preprocess</title>
+	<script>
+		function dynamic() {
+			var supervised_part = document.getElementById("supervised");
+			if (document.getElementById('slearn').checked == true) {
+				document.getElementById('supervised').style.visibility = "visible";
+				var alg = document.getElementById('alg');
+				alg[0].innerHTML = "Random Forest";
+				alg[0].setAttribute('value','RF');
+				alg[1].innerHTML = "Support Vector Machines";
+				alg[1].setAttribute('value','SVM');
+			}
+			if (document.getElementById('ulearn').checked == true) {
+				document.getElementById('supervised').style.visibility = "hidden";
+				var alg = document.getElementById('alg');
+				alg[0].value="KM";
+				alg[0].innerHTML="K Means Clustering";
+				alg.remove(1);
+			
+			}
+		}
+		
+		function execution() {
+			setInterval(dynamic,1);
+		}
+	</script>
+	</head>		
+	<body onload="execution()">
 		1. View uploaded Dataset {{path}} <br>
 		2. Edit uploaded dataset <br>
 		3. View column_names and their data types <br> {{column_names}} <br> {{data_types}} <br>
@@ -9,20 +35,22 @@
 		5. Based on Learning type, display option to select target class <br>
 		<form name="form1" method="post" action="http://localhost:5000/project/{{ proj_name }}/preprocess" enctype="multipart/form-data">
 			<br><b>Select the type of learning algorithm</b><br>
-			<input type="radio" name="Learn_Method" value="Supervised">Supervised</input><br>
-			<input type="radio" name="Learn_Method" value="Unsupervised">Unsupervised</input><br><br>
-			<select name="Algorithm">
+			<input type="radio" name="Learn_Method" value="Supervised" id="slearn">Supervised</input><br>
+			<input type="radio" name="Learn_Method" value="Unsupervised" id="ulearn">Unsupervised</input><br><br>
+			<select name="Algorithm" id="alg">
 				<option value="RF">Random Forest</option>
-        <option value="SVM">Support Vector Machine</option>
+        			<option value="SVM">Support Vector Machine</option>
 			</select><br><br>
-			<b>Use the list below to select features. They will be preprocessed</b><br>
-			{% for col in column_names %}
-				<input type="checkbox" name="features" value="{{col}}">{{ col }}</input><br>
-			{% endfor %}
-			<br><b>Use the list below to select the target class for prediction</b><br>
-			{% for col in column_names %}
-				<input type="checkbox" name="target" value="{{col}}">{{col}}</input><br>
-			{% endfor %}
+			<div id="supervised">
+				<b>Use the list below to select features. They will be preprocessed</b><br>
+				{% for col in column_names %}
+					<input type="checkbox" name="features" value="{{col}}">{{ col }}</input><br>
+				{% endfor %}
+				<br><b>Use the list below to select the target class for prediction</b><br>
+				{% for col in column_names %}
+					<input type="checkbox" name="target" value="{{col}}">{{col}}</input><br>
+				{% endfor %}
+			</div>
 			<br><input type="submit" value="Submit" />
 		</form>
 	</body>
