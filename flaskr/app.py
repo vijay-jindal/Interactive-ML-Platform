@@ -32,7 +32,7 @@ def new_project(project_name):
 def upload(project_name):
     if request.method == 'GET':
         if hasattr(project,"name") and project_name == getattr(project,"name"):
-            return render_template('upload-csv.html')
+            return render_template('upload-csv.html',proj_name=project_name)
         else:
             return redirect('/')
     elif request.method == 'POST' and 'dataset' in request.files:
@@ -83,7 +83,7 @@ def model(project_name):
     if request.method == 'GET':
         if hasattr(project,"name") and project_name == getattr(project,"name") and hasattr(project,"dataset") and hasattr(project,"model"):
             # Send default parameters available for the model to frontend
-            return render_template('default_params.html',def_params=project.model.get_params())
+            return render_template('default_params.html',def_params=project.model.get_params(),proj_name=project_name)
         else:
             return redirect('/')
     elif request.method == 'POST':
