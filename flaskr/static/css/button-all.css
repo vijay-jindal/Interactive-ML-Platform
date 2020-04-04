@@ -1,0 +1,44 @@
+.button {
+        background-color: green;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        }
+.hbtn {
+      position: relative;
+      box-sizing: border-box;
+      display: inline-block;
+      overflow: hidden;
+      padding: 8px 20px;
+      margin: 0px 3px 6px;
+      text-align: center;
+      border: 2px solid rgb(255, 255, 255);
+      text-decoration: none;
+      color: rgb(255, 255, 255);
+      white-space: nowrap;
+      z-index: 0;
+}
+
+
+.hbtn i {
+      padding-right: 8px;
+}
+
+
+.hb-border-off2 {
+      transition: border-top-color 0.1s linear 0.21s, border-right-color 0.1s linear 0.14s, border-bottom-color 0.1s linear 0.07s, border-left-color 0.1s linear 0s;
+      border-color: rgb(255, 255, 255);
+      transition-duration: 0.3s;
+}
+
+
+.hb-border-off2:hover {
+      transition: border-top-color 0.1s linear 0s, border-right-color 0.1s linear 0.07s, border-bottom-color 0.1s linear 0.14s, border-left-color 0.1s linear 0.21s;
+      border-color: transparent;
+}
