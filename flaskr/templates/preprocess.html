@@ -74,6 +74,7 @@ input.file {
   opacity: 0;
   z-index: 2;
 }
+
 /*button {
     background-color: Transparent;
     background-repeat:no-repeat;
@@ -101,6 +102,8 @@ input.file {
 	height: auto;
 }
 .button:hover {opacity: 0.6}
+
+.select { background-color: #000000; }
 
 </style>
 </head>
@@ -138,10 +141,12 @@ input.file {
 	<br><b>Select the type of learning algorithm</b><br>
 	<input type="radio" name="Learn_Method" value="Supervised" id="slearn">Supervised</input><br>
 	<input type="radio" name="Learn_Method" value="Unsupervised" id="ulearn">Unsupervised</input><br><br>
-	<select name="Algorithm" id="alg">
-		<option value="RF">Random Forest</option>
-					<option value="SVM">Support Vector Machine</option>
+	
+	<select name="Algorithm" id="alg" class="select">
+		<option value="RF" class="opt">Random Forest</option>
+		<option value="SVM" class="opt">Support Vector Machine</option>
 	</select><br><br>
+	
 	<div id="supervised">
 		<b>Use the list below to select features. They will be preprocessed</b><br>
 		{% for col in column_names %}
