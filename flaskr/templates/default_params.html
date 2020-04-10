@@ -70,24 +70,21 @@
 	</div>
 
 	<div class="container-fluid bg-2 text-center">
-		<h2>Edit Default Parameters</h2><br>
-		<table align="center" class="param">
-			<tr>
-				<th>PARAMETER</th>
-				<th>DEFAULT VALUE</th>
-			</tr>
-		{% for key in def_params.keys() %}
+		<form name="default_params" id="def_params" action="http://localhost:5000/project/{{proj_name}}/model" method="post" enctype="multipart/form-data">
+			<h2>Edit Default Parameters</h2><br>
+			<table align="center" class="param">
 				<tr>
-					<td> {{ key }} </td>
-					<td><input type="text" value={{ def_params[key] }} name="{{ key }}" /></td>
+					<th>PARAMETER</th>
+					<th>DEFAULT VALUE</th>
 				</tr>
-		{% endfor %}
-		</table>
-		<form class="" action="#" method="post">
-			<br><button type="submit" value="Submit" id="sub" class="far fa-arrow-alt-circle-left" style="width: auto; height: auto; background: transparent; border: none;"></button> <!-- to be linked to next page-->
-		</form>
-		<form class="" action="#" method="post">
-			<button type="submit" value="Submit" id="sub" class="far fa-arrow-alt-circle-right" style="width: auto; height: auto; background: transparent; border: none;"></button> <!-- to be linked to next page-->
+				{% for key in def_params.keys() %}
+					<tr>
+						<td> {{ key }} </td>
+						<td><input type="text" name="def_value" value={{ def_params[key] }}/></td>
+					</tr>
+				{% endfor %}
+			</table>
+		<input type="submit" value="Submit" style="background-color:black;"/>
 		</form>
 	</div>
 	</body>

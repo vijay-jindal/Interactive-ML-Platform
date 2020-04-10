@@ -92,6 +92,18 @@ def model(project_name):
         # 0.20 means 20% data will be for validation (test)
         # Also consider possibility of complete training
         # Show realtime messages from training (set verbose flag in model)
+        changed_params = request.form.getlist('def_value')
+        for j in changed_params:
+            changed_params[changed_params.index(j)] = j.rstrip('/')
+        print(changed_params)
+        print()
+        i = 0
+        def_dict = project.model.get_params()
+        for key in def_dict.keys():
+            def_dict[key] = changed_params[i]
+            i += 1
+        print(def_dict)
+        # Use def_dict dictionary for prediction
         return redirect('/project/'+project_name+'/prediction')
     else:
         return redirect('/')
