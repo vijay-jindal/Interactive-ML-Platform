@@ -7,9 +7,11 @@
   <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static',filename='css/font.css') }}" rel="stylesheet">
   <link href="{{ url_for('static',filename='css/styles.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='css/all.css') }}" rel="stylesheet">
+  <script src="{{ url_for('static',filename='scripts/all.js') }}"></script>
   <script src="{{ url_for('static',filename='scripts/bootstrap.min.js') }}"></script>
   <script src="{{ url_for('static',filename='scripts/jquery.min.js') }}"></script>
-  <script src="https://kit.fontawesome.com/bbcafd632e.js" crossorigin="anonymous"></script></head>
+  <!--<script src="https://kit.fontawesome.com/bbcafd632e.js" crossorigin="anonymous"></script>--></head>
 	<script>
 		function dynamic() {
 			var supervised_part = document.getElementById("supervised");
@@ -141,12 +143,12 @@ input.file {
 	<br><b>Select the type of learning algorithm</b><br>
 	<input type="radio" name="Learn_Method" value="Supervised" id="slearn">Supervised</input><br>
 	<input type="radio" name="Learn_Method" value="Unsupervised" id="ulearn">Unsupervised</input><br><br>
-	
+
 	<select name="Algorithm" id="alg" class="select">
 		<option value="RF" class="opt">Random Forest</option>
 		<option value="SVM" class="opt">Support Vector Machine</option>
 	</select><br><br>
-	
+
 	<div id="supervised">
 		<b>Use the list below to select features. They will be preprocessed</b><br>
 		{% for col in column_names %}
