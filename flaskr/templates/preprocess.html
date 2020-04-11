@@ -8,9 +8,10 @@
   <link href="{{ url_for('static',filename='css/font.css') }}" rel="stylesheet">
   <link href="{{ url_for('static',filename='css/styles.css') }}" rel="stylesheet">
   <link href="{{ url_for('static',filename='css/all.css') }}" rel="stylesheet">
-  <script src="{{ url_for('static',filename='scripts/all.js') }}"></script>
+  <!--<script src="{{ url_for('static',filename='scripts/all.js') }}"></script>-->
   <script src="{{ url_for('static',filename='scripts/bootstrap.min.js') }}"></script>
   <script src="{{ url_for('static',filename='scripts/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='scripts/bbcafd632e.js') }}" crossorigin="anonymous"></script>
   <!--<script src="https://kit.fontawesome.com/bbcafd632e.js" crossorigin="anonymous"></script>--></head>
 	<script>
 		function dynamic() {
@@ -158,7 +159,7 @@ input.file {
 		{% for col in column_names %}
 				<input type="checkbox" name="target" value="{{col}}">{{col}}</input><br>
 			{% endfor %}<br><br>
-      <br><button type="submit" value="Submit" id="sub" class="far fa-arrow-alt-circle-right" style="width: auto; height: auto; background: transparent; border: none;">Submit</button> <!-- to be linked to next page-->
+      <br><button type="submit" value="Submit" id="sub" class="far fa-arrow-alt-circle-right" style="width: auto; height: auto; background: transparent; border: none;"></button> <!-- to be linked to next page-->
 </form>
 	</div>
 </div>
