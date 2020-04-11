@@ -93,8 +93,6 @@ def model(project_name):
         # Also consider possibility of complete training
         # Show realtime messages from training (set verbose flag in model)
         changed_params = request.form.getlist('def_value')
-        for j in changed_params:
-            changed_params[changed_params.index(j)] = j.rstrip('/')
         print(changed_params)
         print()
         i = 0
