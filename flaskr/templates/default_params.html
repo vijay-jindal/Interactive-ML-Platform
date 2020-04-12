@@ -83,7 +83,16 @@
 				{% for key in def_params.keys() %}
 					<tr>
 						<td> {{ key }} </td>
-						<td><input type="text" name="def_value" value={{ def_params[key] }}></input></td>
+						{% if 'string' in (def_params[key]['param_values']).keys() and ((def_params[key]['param_values'])['string'])|length !=0 %}
+							<td><input type=text name="def_value" list="param_values" value={{ def_params[key].default }}></td>
+							<datalist id=param_values >
+						   		{% for value in def_params[key]['param_values']['string'] %}
+									<option> {{ value }}
+								{% endfor %}
+							</datalist>
+						{% else %}
+							<td><input type="text" name="def_value" value={{ def_params[key].default }}></input></td>
+						{% endif %}
 					</tr>
 				{% endfor %}
 			</table>

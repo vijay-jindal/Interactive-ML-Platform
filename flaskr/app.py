@@ -96,11 +96,12 @@ def model(project_name):
         print(changed_params)
         print()
         i = 0
-        def_dict = project.model.get_params()
+        def_dict = project.model.get_params().copy()
         for key in def_dict.keys():
             def_dict[key] = changed_params[i]
             i += 1
         print(def_dict)
+        project.model.set_params(def_dict)
         # Use def_dict dictionary for prediction
         return redirect('/project/'+project_name+'/prediction')
     else:
@@ -113,7 +114,8 @@ def prediction(project_name):
     # Show classification report
     # above to be shown from sklearn metrics
     # Visualizations
-    return("Hi there {name}, this WIP".format(name="developer"))
+    #return("Hi there {name}, this WIP".format(name="developer"))
+    return(project.model.model_train())
 
 
 if __name__ == '__main__':
