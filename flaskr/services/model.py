@@ -1,15 +1,10 @@
 from sklearn.ensemble import RandomForestClassifier
-from sklearn import tree
 from sklearn.svm import SVC
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
-from sklearn.naive_bayes import MultinomialNB
-
-import pandas as pd
 
 
 class Model(object):
@@ -64,22 +59,23 @@ class Model(object):
         return self.parameters
 
     def process_params(self, params):
+        self.app.logger.info("Changed params : {}".format(params))
         for key in params.keys():
             types = self.parameters[key]['param_values'].keys()
             if 'string' in types and params[key].isalpha():
                 if params[key] not in self.parameters[key]['param_values']['string']:
                     if 'float' in types or 'int' in types:
-                        print("Invalid String input")
+                        self.app.logger.info("Invalid String input")
                     else:
-                        print("Values of key '{}' saved.".format(key))
+                        self.app.logger.info("Values of key '{}' saved.".format(key))
                 else:
-                    print("Values of key '{}' saved.".format(key))
+                    self.app.logger.info("Values of key '{}' saved.".format(key))
             elif 'float' in types:
                 params[key] = float(params[key])
-                print("Values of key '{}' changed from string {} to float {}".format(key,str(params[key]),params[key]))
+                self.app.logger.info("Values of key '{}' changed from string {} to float {}".format(key,str(params[key]),params[key]))
             elif 'int' in types:
                 params[key] = int(params[key])
-                print("Values of key '{}' changed from string {} to int {}".format(key,str(params[key]),params[key]))
+                self.app.logger.info("Values of key '{}' changed from string {} to int {}".format(key,str(params[key]),params[key]))
         return params
 
     def set_params(self, params):
@@ -95,18 +91,22 @@ class Model(object):
         X = self.dataset.get_features()
         y = self.dataset.get_target()
         X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=test_size, random_state=6)
+        self.app.logger.info("Data divided into {}% Training data and {}% Testing data".format((1-test_size)*100,test_size*100))
         return X_train, X_test, Y_train, Y_test
 
     def model_train(self):
         X_train, X_test, Y_train, Y_test = self.get_train_test_data(self.test_size)
+        self.app.logger.info("Training the model. Classifier : {}.".format(self.classifier))
         self.classifier.fit(X_train, Y_train)
+        self.app.logger.info("Model Training done.")
         predictions = self.classifier.predict(X_test)
         acc_score = self.compute_accuracy(predictions, Y_test)
         return "Model Trained with accuracy {}.".format(acc_score)
 
     def compute_accuracy(self, predictions, Y_test):
         acc_score = accuracy_score(Y_test, predictions)
-        print(acc_score)
-        print(confusion_matrix(Y_test, predictions))
-        print(classification_report(Y_test, predictions))
+        self.app.logger.info("MODEL ACCURACY CALCULATED BASED ON TEST DATA: ")
+        self.app.logger.info(acc_score)
+        self.app.logger.info(confusion_matrix(Y_test, predictions))
+        self.app.logger.info(classification_report(Y_test, predictions))
         return acc_score
