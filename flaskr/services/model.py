@@ -21,7 +21,7 @@ class Model(object):
                 'max_features':
                     {
                         'default': 'auto',
-                        'param_values': {'int': [], 'float': [], 'string': [], None: []}
+                        'param_values': {'int': [], 'float': [], 'string': ['auto', 'sqrt', 'log2'], None: []}
                     }
             },
         'SVC':
@@ -62,6 +62,8 @@ class Model(object):
         self.app.logger.info("Changed params : {}".format(params))
         for key in params.keys():
             types = self.parameters[key]['param_values'].keys()
+            if None in types and params[key] == 'None':
+                params[key] = None
             if 'string' in types and params[key].isalpha():
                 if params[key] not in self.parameters[key]['param_values']['string']:
                     if 'float' in types or 'int' in types:
@@ -72,10 +74,12 @@ class Model(object):
                     self.app.logger.info("Values of key '{}' saved.".format(key))
             elif 'float' in types:
                 params[key] = float(params[key])
-                self.app.logger.info("Values of key '{}' changed from string {} to float {}".format(key,str(params[key]),params[key]))
+                self.app.logger.info(
+                    "Values of key '{}' changed from string {} to float {}".format(key, str(params[key]), params[key]))
             elif 'int' in types:
                 params[key] = int(params[key])
-                self.app.logger.info("Values of key '{}' changed from string {} to int {}".format(key,str(params[key]),params[key]))
+                self.app.logger.info(
+                    "Values of key '{}' changed from string {} to int {}".format(key, str(params[key]), params[key]))
         return params
 
     def set_params(self, params):
@@ -91,7 +95,8 @@ class Model(object):
         X = self.dataset.get_features()
         y = self.dataset.get_target()
         X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=test_size, random_state=6)
-        self.app.logger.info("Data divided into {}% Training data and {}% Testing data".format((1-test_size)*100,test_size*100))
+        self.app.logger.info(
+            "Data divided into {}% Training data and {}% Testing data".format((1 - test_size) * 100, test_size * 100))
         return X_train, X_test, Y_train, Y_test
 
     def model_train(self):
