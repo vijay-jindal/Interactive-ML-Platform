@@ -53,6 +53,8 @@ class Model(object):
         self.test_size = 0.2
         self.classifier = eval(self.classifier_name)()  # https://stackoverflow.com/a/7719518
         self.parameters = self.classfier_params[self.classifier_name]
+        for key in self.parameters:
+            self.parameters[key]['current_value'] = self.parameters[key]['default']
         self.app.logger.info("Model Instance created ")
 
     def get_params(self):
@@ -74,14 +76,17 @@ class Model(object):
                         bad_value.append(key)
                     else:
                         self.app.logger.info("Values of key '{}' saved.".format(key))
+                        self.parameters[key]['current_value'] = params[key]
 
                 elif 'float' in types and not params[key].isalpha():
                     params[key] = float(params[key])
+                    self.parameters[key]['current_value'] = params[key]
                     self.app.logger.info(
                         "Values of key '{}' changed from string {} to float {}".format(key, str(params[key]),
                                                                                        params[key]))
                 elif 'int' in types and not params[key].isalpha():
                     params[key] = int(params[key])
+                    self.parameters[key]['current_value'] = params[key]
                     self.app.logger.info(
                         "Values of key '{}' changed from string {} to int {}".format(key, str(params[key]),
                                                                                      params[key]))
@@ -92,7 +97,7 @@ class Model(object):
                 return params, 1
             else:
                 raise Exception
-        except:
+        except Exception:
             self.app.logger.error("INVALID INPUT FOR THE HYPERPARAMETERS '{}'. INPUT : {}".format(bad_value,params))
             params['bad_value'] = bad_value
             return params, 0
@@ -102,6 +107,7 @@ class Model(object):
             processed_params, status = self.process_params(params)
             if status == 1:
                 self.classifier.set_params(**processed_params)
+                print(self.parameters)
                 return 1
             else:
                 raise Exception
