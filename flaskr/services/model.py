@@ -60,31 +60,55 @@ class Model(object):
 
     def process_params(self, params):
         self.app.logger.info("Changed params : {}".format(params))
-        for key in params.keys():
-            types = self.parameters[key]['param_values'].keys()
-            if None in types and params[key] == 'None':
-                params[key] = None
-            elif 'string' in types and params[key].isalpha():
-                if params[key] not in self.parameters[key]['param_values']['string']:
-                    if 'float' in types or 'int' in types:
-                        self.app.logger.info("Invalid String input")
+        bad_value = []
+        try:
+            for key in params.keys():
+                types = self.parameters[key]['param_values'].keys()
+                print(key)
+                if None in types and params[key] == 'None':
+                    params[key] = None
+
+                elif 'string' in types and params[key].isalpha():
+                    if params[key] not in self.parameters[key]['param_values']['string']:
+                        self.app.logger.info("Invalid String input.".format(key))
+                        bad_value.append(key)
                     else:
                         self.app.logger.info("Values of key '{}' saved.".format(key))
+
+                elif 'float' in types and not params[key].isalpha():
+                    params[key] = float(params[key])
+                    self.app.logger.info(
+                        "Values of key '{}' changed from string {} to float {}".format(key, str(params[key]),
+                                                                                       params[key]))
+                elif 'int' in types and not params[key].isalpha():
+                    params[key] = int(params[key])
+                    self.app.logger.info(
+                        "Values of key '{}' changed from string {} to int {}".format(key, str(params[key]),
+                                                                                     params[key]))
                 else:
-                    self.app.logger.info("Values of key '{}' saved.".format(key))
-            elif 'float' in types:
-                params[key] = float(params[key])
-                self.app.logger.info(
-                    "Values of key '{}' changed from string {} to float {}".format(key, str(params[key]), params[key]))
-            elif 'int' in types:
-                params[key] = int(params[key])
-                self.app.logger.info(
-                    "Values of key '{}' changed from string {} to int {}".format(key, str(params[key]), params[key]))
-        return params
+                    bad_value.append(key)
+
+            if len(bad_value) == 0:
+                return params, 1
+            else:
+                raise Exception
+        except:
+            self.app.logger.error("INVALID INPUT FOR THE HYPERPARAMETERS '{}'. INPUT : {}".format(bad_value,params))
+            params['bad_value'] = bad_value
+            return params, 0
 
     def set_params(self, params):
-        self.classifier.set_params(**self.process_params(params))
+        try:
+            processed_params, status = self.process_params(params)
+            if status == 1:
+                self.classifier.set_params(**processed_params)
+                return 1
+            else:
+                raise Exception
+        except:
+            return "Invalid value for the hyperparameters {}".format(processed_params['bad_value'])
         # modify self.parameters too
+
     def set_split_ratio(self, test_size):
         self.test_size = test_size
         # if 0 then perform complete training

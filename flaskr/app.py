@@ -101,8 +101,11 @@ def model(project_name):
         # 0.20 means 20% data will be for validation (test)
         # Also consider possibility of complete training
         # Show realtime messages from training (set verbose flag in model)
-        project.model.set_params(request.form.to_dict())
-        return redirect('/project/'+project_name+'/prediction')
+        set_params_response = project.model.set_params(request.form.to_dict())
+        if set_params_response == 1:
+            return redirect('/project/'+project_name+'/prediction')
+        else:
+            return "{}".format(set_params_response)
     else:
         return redirect('/')
 
