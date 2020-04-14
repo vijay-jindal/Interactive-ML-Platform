@@ -140,7 +140,7 @@ input.file {
 
 <!--Fourth Container-->
 <div class="container-fluid bg-4 text-center">
-<form name="form1" method="post" action="http://localhost:5000/project/{{ proj_name }}/preprocess" enctype="multipart/form-data">
+<form name="form1" method="post" enctype="multipart/form-data">
 	<br><b>Select the type of learning algorithm</b><br>
 	<input type="radio" name="Learn_Method" value="Supervised" id="slearn">Supervised</input><br>
 	<input type="radio" name="Learn_Method" value="Unsupervised" id="ulearn">Unsupervised</input><br><br>
@@ -157,7 +157,7 @@ input.file {
 		{% endfor %}
 		<br><b>Use the list below to select the target class for prediction <br>(Selecting any one is Compulsory)</b><br>
 		{% for col in column_names %}
-				<input type="checkbox" name="target" value="{{col}}">{{col}}</input><br>
+				<input type="radio" name="target" value="{{col}}">{{col}}</input><br>
 			{% endfor %}<br><br>
       <br><button type="submit" value="Submit" id="sub" class="far fa-arrow-alt-circle-right" style="width: auto; height: auto; background: transparent; border: none;"></button> <!-- to be linked to next page-->
 </form>

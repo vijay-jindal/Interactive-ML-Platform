@@ -51,9 +51,9 @@ class Model(object):
         self.dataset = dataset
         self.classifier_name = name
         self.test_size = 0.2
-        self.classifier = eval(name)()  # https://stackoverflow.com/a/7719518
-        self.app.logger.info("Model Instance created ")
+        self.classifier = eval(self.classifier_name)()  # https://stackoverflow.com/a/7719518
         self.parameters = self.classfier_params[self.classifier_name]
+        self.app.logger.info("Model Instance created ")
 
     def get_params(self):
         return self.parameters
@@ -64,7 +64,7 @@ class Model(object):
             types = self.parameters[key]['param_values'].keys()
             if None in types and params[key] == 'None':
                 params[key] = None
-            if 'string' in types and params[key].isalpha():
+            elif 'string' in types and params[key].isalpha():
                 if params[key] not in self.parameters[key]['param_values']['string']:
                     if 'float' in types or 'int' in types:
                         self.app.logger.info("Invalid String input")
@@ -84,7 +84,7 @@ class Model(object):
 
     def set_params(self, params):
         self.classifier.set_params(**self.process_params(params))
-
+        # modify self.parameters too
     def set_split_ratio(self, test_size):
         self.test_size = test_size
         # if 0 then perform complete training
@@ -94,10 +94,9 @@ class Model(object):
     def get_train_test_data(self, test_size):
         X = self.dataset.get_features()
         y = self.dataset.get_target()
-        X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=test_size, random_state=6)
         self.app.logger.info(
             "Data divided into {}% Training data and {}% Testing data".format((1 - test_size) * 100, test_size * 100))
-        return X_train, X_test, Y_train, Y_test
+        return train_test_split(X, y, test_size=test_size, random_state=6)
 
     def model_train(self):
         X_train, X_test, Y_train, Y_test = self.get_train_test_data(self.test_size)
