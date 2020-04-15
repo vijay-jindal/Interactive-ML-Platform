@@ -16,12 +16,12 @@ class Model(object):
                 'n_estimators':
                     {
                         'default': 100,
-                        'param_values': {'int': []}
+                        'param_values': {'int': ['+']}
                     },
                 'max_features':
                     {
                         'default': 'auto',
-                        'param_values': {'int': [], 'float': [], 'string': ['auto', 'sqrt', 'log2'], None: []}
+                        'param_values': {'int': ['+'], 'float': ['+'], 'string': ['auto', 'sqrt', 'log2'], None: []}
                     }
             },
         'SVC':
@@ -40,7 +40,7 @@ class Model(object):
                     {
                         'default': 'scale',
                         'param_values': {'string': ['scale', 'auto'],
-                                         'float': []}
+                                         'float': ['+']}
                     }
             }
 
@@ -78,18 +78,39 @@ class Model(object):
                         self.app.logger.info("Values of key '{}' saved.".format(key))
                         self.parameters[key]['current_value'] = params[key]
 
-                elif 'float' in types and not params[key].isalpha():
-                    params[key] = float(params[key])
-                    self.parameters[key]['current_value'] = params[key]
-                    self.app.logger.info(
-                        "Values of key '{}' changed from string {} to float {}".format(key, str(params[key]),
-                                                                                       params[key]))
-                elif 'int' in types and not params[key].isalpha():
-                    params[key] = int(params[key])
-                    self.parameters[key]['current_value'] = params[key]
-                    self.app.logger.info(
-                        "Values of key '{}' changed from string {} to int {}".format(key, str(params[key]),
-                                                                                     params[key]))
+                elif 'float' in types and (params[key].count('.') == 1 or float(params[key].count('.')) == 0):
+                    if '+' in self.parameters[key]['param_values']['float'] and float(params[key]) >= 0:
+                        params[key] = float(params[key])
+                        self.parameters[key]['current_value'] = params[key]
+                        self.app.logger.info(
+                            "Values of key '{}' changed from string {} to float {}".format(key, str(params[key]),
+                                                                                           params[key]))
+                    elif '-' in self.parameters[key]['param_values']['float'] and float(params[key]) <= 0:
+                        params[key] = float(params[key])
+                        self.parameters[key]['current_value'] = params[key]
+                        self.app.logger.info(
+                            "Values of key '{}' changed from string {} to float {}".format(key, str(params[key]),
+                                                                                           params[key]))
+                    else:
+                        bad_value.append(key)
+
+                elif 'int' in types and (params[key].lstrip("-").isnumeric() or params[key].lstrip("+").isnumeric()):
+                    print(int(params[key]))
+                    if '+' in self.parameters[key]['param_values']['int'] and int(params[key]) >= 0:
+                        params[key] = int(params[key])
+                        self.parameters[key]['current_value'] = params[key]
+                        self.app.logger.info(
+                            "Values of key '{}' changed from string {} to int {}".format(key, str(params[key]),
+                                                                                         params[key]))
+                    elif '-' in self.parameters[key]['param_values']['int'] and int(params[key]) <= 0:
+                        params[key] = int(params[key])
+                        self.parameters[key]['current_value'] = params[key]
+                        self.app.logger.info(
+                            "Values of key '{}' changed from string {} to int {}".format(key, str(params[key]),
+                                                                                         params[key]))
+                    else:
+                        bad_value.append(key)
+
                 else:
                     bad_value.append(key)
 
@@ -97,7 +118,9 @@ class Model(object):
                 return params, 1
             else:
                 raise Exception
-        except Exception:
+        except Exception as e:
+            print(bad_value)
+            self.app.logger.error(e)
             self.app.logger.error("INVALID INPUT FOR THE HYPERPARAMETERS '{}'. INPUT : {}".format(bad_value,params))
             params['bad_value'] = bad_value
             return params, 0
