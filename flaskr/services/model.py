@@ -79,7 +79,7 @@ class Model(object):
                         self.app.logger.info("Values of key '{}' saved.".format(key))
                         self.parameters[key]['current_value'] = params[key]
 
-                elif 'float' in types and (params[key].count('.') == 1 or float(params[key].count('.')) == 0) and special_character_regex.search(params[key]) is None:
+                elif 'float' in types and params[key].replace('.','').isnumeric() and (params[key].count('.') == 1 or params[key].count('.') == 0) and special_character_regex.search(params[key]) is None:
                     if '+' in self.parameters[key]['param_values']['float'] and float(params[key]) >= 0:
                         params[key] = float(params[key])
                         self.parameters[key]['current_value'] = params[key]
@@ -137,7 +137,6 @@ class Model(object):
                 raise Exception
         except:
             return "Invalid value for the hyperparameters {}".format(processed_params['bad_value'])
-        # modify self.parameters too
 
     def set_split_ratio(self, test_size):
         self.test_size = test_size
