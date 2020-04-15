@@ -70,7 +70,7 @@ class Model(object):
                 if None in types and params[key] == 'None':
                     params[key] = None
 
-                elif 'string' in types and params[key].isalpha():
+                elif 'string' in types:
                     if params[key] not in self.parameters[key]['param_values']['string']:
                         self.app.logger.info("Invalid String input.".format(key))
                         bad_value.append(key)
