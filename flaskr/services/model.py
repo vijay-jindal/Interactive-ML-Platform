@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
-
+import re
 
 class Model(object):
     """docstring for Model."""
@@ -63,6 +63,7 @@ class Model(object):
     def process_params(self, params):
         self.app.logger.info("Changed params : {}".format(params))
         bad_value = []
+        special_character_regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
         try:
             for key in params.keys():
                 types = self.parameters[key]['param_values'].keys()
@@ -70,7 +71,7 @@ class Model(object):
                 if None in types and params[key] == 'None':
                     params[key] = None
 
-                elif 'string' in types:
+                elif 'string' in types and (params[key].isalnum() and not params[key].isnumeric()) and special_character_regex.search(params[key]) is None:
                     if params[key] not in self.parameters[key]['param_values']['string']:
                         self.app.logger.info("Invalid String input.".format(key))
                         bad_value.append(key)
@@ -78,7 +79,7 @@ class Model(object):
                         self.app.logger.info("Values of key '{}' saved.".format(key))
                         self.parameters[key]['current_value'] = params[key]
 
-                elif 'float' in types and (params[key].count('.') == 1 or float(params[key].count('.')) == 0):
+                elif 'float' in types and (params[key].count('.') == 1 or float(params[key].count('.')) == 0) and special_character_regex.search(params[key]) is None:
                     if '+' in self.parameters[key]['param_values']['float'] and float(params[key]) >= 0:
                         params[key] = float(params[key])
                         self.parameters[key]['current_value'] = params[key]
@@ -94,7 +95,7 @@ class Model(object):
                     else:
                         bad_value.append(key)
 
-                elif 'int' in types and (params[key].lstrip("-").isnumeric() or params[key].lstrip("+").isnumeric()):
+                elif 'int' in types and (params[key].lstrip("-").isnumeric() or params[key].lstrip("+").isnumeric()) and special_character_regex.search(params[key]) is None:
                     print(int(params[key]))
                     if '+' in self.parameters[key]['param_values']['int'] and int(params[key]) >= 0:
                         params[key] = int(params[key])
