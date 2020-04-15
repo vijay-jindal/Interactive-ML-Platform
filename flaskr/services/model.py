@@ -70,6 +70,7 @@ class Model(object):
                 print(key)
                 if None in types and params[key] == 'None':
                     params[key] = None
+                    self.parameters[key]['current_value'] = params[key]
 
                 elif 'string' in types and (params[key].isalnum() and not params[key].isnumeric()) and special_character_regex.search(params[key]) is None:
                     if params[key] not in self.parameters[key]['param_values']['string']:
