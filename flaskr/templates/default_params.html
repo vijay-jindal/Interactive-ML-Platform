@@ -73,17 +73,26 @@
 	</div>
 
 	<div class="container-fluid bg-2 text-center">
-		<form name="default_params" id="def_params" action="http://localhost:5000/project/{{proj_name}}/model" method="post" enctype="multipart/form-data">
+		<form name="default_params" id="def_params" method="post" enctype="multipart/form-data">
 			<h2>Edit Default Parameters</h2><br>
 			<table align="center" class="param">
 				<tr>
 					<th>PARAMETER</th>
-					<th>DEFAULT VALUE</th>
+					<th>VALUE</th>
 				</tr>
-				{% for key in def_params.keys() %}
+				{% for k,v in def_params.items() %}
 					<tr>
-						<td> {{ key }} </td>
-						<td><input type="text" name="def_value" value={{ def_params[key] }}></input></td>
+						<td> {{ k }} </td>
+						{% if 'string' in v['param_values'] and v['param_values']['string']|length > 0 %}
+							<td><input type="text" name="{{ k }}" list="{{ k }}" value="{{ v['default'] }}"></td>
+							<datalist id="{{ k }}" >
+						   		{% for value in v['param_values']['string'] %}
+									<option> {{ value }}
+								{% endfor %}
+							</datalist>
+						{% else %}
+							<td><input type="text" name="{{ k }}" value="{{ v['default'] }}"></input></td>
+						{% endif %}
 					</tr>
 				{% endfor %}
 			</table>
