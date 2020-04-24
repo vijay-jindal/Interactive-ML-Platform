@@ -53,8 +53,8 @@ class Model(object):
         self.test_size = 0.2
         self.classifier = eval(self.classifier_name)()  # https://stackoverflow.com/a/7719518
         self.parameters = self.classfier_params[self.classifier_name]
-        for key in self.parameters:
-            self.parameters[key]['current_value'] = self.parameters[key]['default']
+        for param in self.parameters.values(): # Optimized further : https://stackoverflow.com/a/61380863/10155936
+            param['current_value'] = param['default']
         self.app.logger.info("Model Instance created ")
 
     def get_params(self):
@@ -128,6 +128,7 @@ class Model(object):
             return params, 0
 
     def set_params(self, params):
+        self.set_split_ratio(float(params.pop('split_ratio',None)))
         try:
             processed_params, status = self.process_params(params)
             if status == 1:
@@ -141,11 +142,11 @@ class Model(object):
 
     def set_split_ratio(self, test_size):
         self.test_size = test_size
-        # if 0 then perform complete training
-        # else store as X_train, X_validation , y_train , y_validation
-        # use dataset instance
 
     def get_train_test_data(self, test_size):
+        # if test_size is 0 then perform complete training
+        # else store as X_train, X_validation , y_train , y_validation
+        # use dataset instance
         X = self.dataset.get_features()
         y = self.dataset.get_target()
         self.app.logger.info(

@@ -56,7 +56,7 @@ def preprocess(project_name):
             app.logger.info(data_types)
             app.logger.info(project.dataset.path)
             return render_template('preprocess.html', path=project.dataset.path, column_names=column_names,
-                                   data_types=data_types, proj_name=project_name)
+                                   data_types=data_types, proj_name=project_name, data=project.dataset.df.to_html())
         else:
             return redirect('/')
     elif request.method == 'POST':

@@ -131,6 +131,7 @@ input.file {
   <h2>Details of the project:</h2><br>
   <h5>
   &nbsp&nbsp  1. View uploaded Dataset:<!--&nbsp <u> {{path}}</u> &nbsp-->&nbsp&nbsp <a href="file:{{path}}" class="fa fa-folder-open"></a><br><br> <br><br><!--Link this to a local file-->
+              {{data|safe}}  <br>       
   &nbsp&nbsp  2. Edit uploaded dataset &nbsp <button type="button" name="button" class="far fa-edit" style="background: transparent; border: none;"></button> <br><br><br><br> <!--To be linked to edit csv page-->
   &nbsp&nbsp  3. View column_names and their data types <br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp {{column_names}} <br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp {{data_types}} <br><br><br><br>
   &nbsp&nbsp  4. Compulsory and Optional Checks in Preprocessing <br><br><br><br>
