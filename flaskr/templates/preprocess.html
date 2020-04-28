@@ -48,6 +48,15 @@
 		function execution() {
 			setInterval(dynamic,1);
 		}
+
+    function myFunction() {
+  var x = document.getElementById("myDIV");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
 	</script>
 
 <style media="screen">
@@ -108,6 +117,46 @@ input.file {
 
 .select { background-color: #000000; }
 
+body            { font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;}
+a, h1, h2       { color: #377ba8; }
+h1, h2          { margin: 0; }
+h1              { border-bottom: 2px solid #eee; }
+h2              { font-size: 1.2em; }
+
+table.dataframe, .dataframe th, .dataframe td {
+  border: none;
+  border-bottom: 1px solid #C8C8C8;
+  border-collapse: collapse;
+  text-align:left;
+  padding: 10px;
+  margin-bottom: 40px;
+  font-size: 0.9em;
+}
+
+.male th {
+    background-color: #add8e6;
+    color: white;
+}
+
+.female th {
+    background-color: #77dd77;
+    color: white;
+}
+
+tr:nth-child(odd)		{ background-color:#eee; }
+tr:nth-child(even)	{ background-color:#fff; }
+
+tr:hover            { background-color: #ffff99;}
+
+#myDIV {
+  width: 100%;
+  padding: 50px 0;
+  text-align: center;
+  background-color: transparent;
+  margin-top: 20px;
+  display: none;
+}
+
 </style>
 </head>
 
@@ -130,14 +179,17 @@ input.file {
 <div class="container-fluid bg-2">
   <h2>Details of the project:</h2><br>
   <h5>
-  &nbsp&nbsp  1. View uploaded Dataset:<!--&nbsp <u> {{path}}</u> &nbsp-->&nbsp&nbsp <a href="file:{{path}}" class="fa fa-folder-open"></a><br><br> <br><br><!--Link this to a local file-->
-              {{data|safe}}  <br>       
+  &nbsp&nbsp  1. View uploaded Dataset:<!--&nbsp <u> {{path}}</u> &nbsp-->&nbsp&nbsp <button onclick="myFunction()" type="view" value="view" id="view" class="far fa-folder-open" style="width: auto; height: auto; background: transparent; border: none;" padding="20px"></button><br><br> <br><br><!--Link this to a local file-->
   &nbsp&nbsp  2. Edit uploaded dataset &nbsp <button type="button" name="button" class="far fa-edit" style="background: transparent; border: none;"></button> <br><br><br><br> <!--To be linked to edit csv page-->
   &nbsp&nbsp  3. View column_names and their data types <br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp {{column_names}} <br><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp {{data_types}} <br><br><br><br>
   &nbsp&nbsp  4. Compulsory and Optional Checks in Preprocessing <br><br><br><br>
   &nbsp&nbsp  5. Based on Learning type, display option to select target class <br><br><br>
   </h5>
 </div>
+  <div id="myDIV" class="container-fluid bg-3 text-center">
+      <center><h2> DATASET VIEW </h2></center><br><br><br><br><br>
+      <center>  {{data|safe}}  </center>
+  </div>
 
 <!--Fourth Container-->
 <div class="container-fluid bg-4 text-center">
