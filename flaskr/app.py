@@ -8,7 +8,11 @@ Ex: app.logger.info("Message")
 from flask import (
     Flask, render_template, request, redirect
 )
+from time import sleep
+import sys
+import os
 from services.project import Project
+import dash_html_components as html
 
 # create the app
 app = Flask(__name__)
@@ -17,9 +21,7 @@ app = Flask(__name__)
 project = Project(app)
 
 import logging
-
 app.logger.setLevel(logging.INFO)
-
 
 @app.route('/')
 def imlp():
@@ -28,9 +30,22 @@ def imlp():
 
 @app.route('/project/<project_name>')
 def new_project(project_name):
+    os.remove('/tmp/{}.log'.format(project_name))
+    file_handler = logging.FileHandler('/tmp/{}.log'.format(project_name))
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    file_handler.setFormatter(formatter)
+    app.logger.addHandler(file_handler)
     project.create(project_name)
     return redirect('/project/' + project_name + '/upload')
 
+@app.route('/logs/<project_name>')
+def stream(project_name):
+    def generate():
+        with open('/tmp/{}.log'.format(project_name)) as f:
+            while True:
+                yield f.read()
+                sleep(1)
+    return app.response_class(generate(), mimetype='text/plain')
 
 @app.route('/project/<project_name>/upload', methods=['GET', 'POST'])
 def upload(project_name):
