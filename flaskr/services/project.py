@@ -2,11 +2,13 @@ from datetime import datetime
 import os,tempfile
 from services.dataset import Dataset
 from services.model import Model
+from dashApp import dashApp
 
 class Project:
     """docstring for Project."""
-    def __init__(self, app):
+    def __init__(self, app, appDash):
         self.app = app
+        self.appDash = appDash
         self.app.logger.info("Instance for Project Created")
 
     def create(self, project_name):
@@ -23,3 +25,6 @@ class Project:
 
     def create_model(self, name):
         self.model = Model(self.app, self.dataset, Model.Classifiers[name])
+
+    def render_preprocess_app(self):
+        dashAppObject = dashApp(self.app, self.dataset, self.appDash)

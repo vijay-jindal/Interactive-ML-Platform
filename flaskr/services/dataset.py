@@ -24,3 +24,4 @@ class Dataset:
 
     def get_target(self):
         return self.y
+

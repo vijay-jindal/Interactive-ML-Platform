@@ -14,5 +14,6 @@ build/
 *.egg-info/
 
 .idea/
-
+preprocess_test.py
+winequaity-white.csv
 .DS_Store

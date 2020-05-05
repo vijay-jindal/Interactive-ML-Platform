@@ -8,14 +8,25 @@ Ex: app.logger.info("Message")
 from flask import (
     Flask, render_template, request, redirect
 )
+import dash
+import dash_html_components as html
 from services.project import Project
 
 # create the app
 app = Flask(__name__)
 
-# create project instance
-project = Project(app)
+# create dash app
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+dashApp = dash.Dash(
+    __name__,
+    server=app,
+    routes_pathname_prefix='/dash/',
+    external_stylesheets=external_stylesheets
+)
+dashApp.layout = html.Div(id='dash-container')
 
+# create project instance
+project = Project(app, dashApp)
 import logging
 
 app.logger.setLevel(logging.INFO)
@@ -24,7 +35,6 @@ app.logger.setLevel(logging.INFO)
 @app.route('/')
 def imlp():
     return render_template('dashboard.html')
-
 
 @app.route('/project/<project_name>')
 def new_project(project_name):
@@ -50,39 +60,42 @@ def upload(project_name):
 @app.route('/project/<project_name>/preprocess', methods=['GET', 'POST'])
 def preprocess(project_name):
     if request.method == 'GET':
-        if hasattr(project, "name") and project_name == getattr(project, "name") and hasattr(project, "dataset"):
-            column_names, data_types = project.dataset.info()
-            app.logger.info(column_names)
-            app.logger.info(data_types)
-            app.logger.info(project.dataset.path)
-            return render_template('preprocess.html', path=project.dataset.path, column_names=column_names,
-                                   data_types=data_types, proj_name=project_name, data=project.dataset.df.to_html())
-        else:
-            return redirect('/')
-    elif request.method == 'POST':
-        # From frontend get the following
-        # Type of learning (supervised or unsupervised)
-        # Algorithm Name
-        # Based on learning type get list of columns as features and target variable
-        learn_method = request.form['Learn_Method']
-        algo_name = request.form.get('Algorithm')
-        app.logger.info(learn_method + " " + algo_name)
-
-        if learn_method == "Supervised":
-            # If supervised create a Model with algo name
-            project.create_model(algo_name)
-            # Retrieve list of columns as features and target from POST request
-            X = request.form.getlist('features')
-            y = request.form.get('target')
-            project.dataset.set_features(X)
-            project.dataset.set_target(y)
-            return redirect('/project/' + project_name + '/model')
-        elif learn_method == "Unsupervised":
-            return "WIP"
-        else:
-            return "WIP"
-    else:
-        return redirect('/')
+        project.render_preprocess_app()
+        return redirect('/dash')
+    # if request.method == 'GET':
+    #     if hasattr(project, "name") and project_name == getattr(project, "name") and hasattr(project, "dataset"):
+    #         column_names, data_types = project.dataset.info()
+    #         app.logger.info(column_names)
+    #         app.logger.info(data_types)
+    #         app.logger.info(project.dataset.path)
+    #         return render_template('preprocess.html', path=project.dataset.path, column_names=column_names,
+    #                                data_types=data_types, proj_name=project_name, data=project.dataset.df.to_html())
+    #     else:
+    #         return redirect('/')
+    # elif request.method == 'POST':
+    #     # From frontend get the following
+    #     # Type of learning (supervised or unsupervised)
+    #     # Algorithm Name
+    #     # Based on learning type get list of columns as features and target variable
+    #     learn_method = request.form['Learn_Method']
+    #     algo_name = request.form.get('Algorithm')
+    #     app.logger.info(learn_method + " " + algo_name)
+    #
+    #     if learn_method == "Supervised":
+    #         # If supervised create a Model with algo name
+    #         project.create_model(algo_name)
+    #         # Retrieve list of columns as features and target from POST request
+    #         X = request.form.getlist('features')
+    #         y = request.form.get('target')
+    #         project.dataset.set_features(X)
+    #         project.dataset.set_target(y)
+    #         return redirect('/project/' + project_name + '/model')
+    #     elif learn_method == "Unsupervised":
+    #         return "WIP"
+    #     else:
+    #         return "WIP"
+    # else:
+    #     return redirect('/')
 
 
 @app.route('/project/<project_name>/model', methods=['GET', 'POST'])
@@ -119,6 +132,7 @@ def prediction(project_name):
     # Visualizations
     # return("Hi there {name}, this WIP".format(name="developer"))
     return (project.model.model_train())
+
 
 
 if __name__ == '__main__':
