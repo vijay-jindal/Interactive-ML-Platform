@@ -33,6 +33,13 @@ navbar = dbc.NavbarSimple(
     brand="Interactive ML Platform",
     brand_href="#",
     color="primary",
+    children=[
+        dbc.Button(
+            "Exploratory Data Analysis (EDA)",
+            id="eda_btn",href="/eda",
+            className="mb-3",
+            color="primary",style={'width':'100%'}
+        )],
     dark=True, style={
         'width': '100%',
         'height': '7rem',

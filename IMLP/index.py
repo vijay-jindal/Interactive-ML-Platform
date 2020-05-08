@@ -3,7 +3,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 
 from app import app
-from apps import homepage, preprocess
+from apps import homepage, preprocess, eda
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
@@ -19,6 +19,8 @@ def display_page(pathname):
         return homepage.layout
     elif pathname == '/preprocess':
         return preprocess.layout
+    elif pathname == '/eda':
+        return eda.layout
     else:
         return '404'
 
