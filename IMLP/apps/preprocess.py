@@ -1,29 +1,11 @@
-import os
-
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_table
-import pandas as pd
 import dash_bootstrap_components as dbc
-import base64
-import io
-
-from dash.exceptions import PreventUpdate
-from services.project import Project
-
-# Setting styles and css
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', dbc.themes.BOOTSTRAP]
-learning_type = ""
-
-# Creating object of Dash
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
-project = Project(app)
-import logging
-
-app.logger.setLevel(logging.INFO)
+import dash_table
+from app import app, project
+import pandas as pd
 
 # dataframe object with no value for default datatable content
 df = pd.DataFrame()
@@ -58,9 +40,6 @@ navbar = dbc.NavbarSimple(
     }
 )
 
-# Textbox to take project Name
-project_name_textbox = dbc.Input(id='project_name_textbox', valid=False, style={'font-size': '25px'},
-                                 placeholder="Enter Project Title Here", debounce=True)
 # Breakline
 breakline = html.Br()
 
@@ -128,7 +107,7 @@ missing_value_collapse = html.Div(
             color="primary",style={'width':'100%'}
         ),
         dbc.Collapse(
-            dbc.Card(dbc.CardBody([breakline,
+            dbc.Card(dbc.CardBody([
                  dcc.Dropdown(id="placeholders", multi=True, placeholder='Select placeholders', style=dict(
                     width='100%',
                     verticalAlign="middle")),breakline,
@@ -155,12 +134,20 @@ missing_value_collapse = html.Div(
                             id="cancel_btn",
                             className="mb-3", n_clicks=0,
                             style={'width': '100%'}
-                        )],id='cancel_col',style={'width':'auto'})],
+                        )],id='cancel_col',style={'width':'auto'}),
+                    dbc.Col([
+                        html.Button(
+                            "UPDATE DATASET",
+                            id="update_dataset_btn",
+                            className="mb-3", n_clicks=0,
+                            style={'width': '100%'}
+                        )], id='update_col', style={'width': '100%'}),
+                    ],
                 id='apply_or_cancel',style={'display':'none'}),breakline,
-            ])),
+    ])),
             id="missing_value",
         ),
-    ],style={'width':'80%'}
+    ],style={'width':'100%'}
 )
 
 duplicate_column_collapse = html.Div(
@@ -189,17 +176,19 @@ duplicate_column_collapse = html.Div(
             ])),
             id="duplicate_columns",
         ),
-    ],style={'width':'80%'}
+    ],style={'width':'100%'}
 )
 
 # Tabs to do perform various preprocessing steps independently by the user
 process_tabs = dcc.Tabs(id='preprocess_tabs', value='tab-1', children=[
     dcc.Tab(label='Pre-process functions', value='tab-1', children=
     [
-        dbc.Row(breakline),
+        dbc.CardBody([
+            dbc.Row(breakline),
         dbc.Row(missing_value_collapse),
-        dbc.Row(duplicate_column_collapse)
-    ]),
+            breakline,
+        dbc.Row(duplicate_column_collapse)])
+    ],),
     dcc.Tab(label='Pre-process Attributes', value='tab-2',children=[
         dbc.CardBody(
             [
@@ -217,10 +206,13 @@ process_tabs = dcc.Tabs(id='preprocess_tabs', value='tab-1', children=[
         dbc.Row(breakline),
         dbc.Row(split_ratio_value),
 
-    ])])
-], style=tabs_styles),
+    ])],)
+], style = {
+    'height': '80px', 'width': '330px'
+}),
 
 # Datatable to show the dataset to the user
+# TODO: Pagination page number text box width to be increased
 datatable_before_apply = dash_table.DataTable(id='table1', css=[{'selector': '.row', 'rule': 'margin: 0'},{"selector": ".show-hide", "rule": "display: none"}],
                                  columns=[{"name": i, "id": i} for i in df],
                                  data=df.to_dict('records'),
@@ -244,37 +236,17 @@ dataset_input_display = dbc.Card(
     ), outline=True, color="info"
 )
 
-# Component to take project details input
-project_info = [
-    dbc.CardHeader("PROJECT DETAILS", style={'font-family': 'Times New Roman', 'font-size': '15px'}),
-    dbc.CardBody(
-        [project_name_textbox]
-    )]
-
 # Component to show page footer
 page_footer = html.Div(children=[breakline, breakline, breakline],
                        style={'width': '100%', 'height': '40%', 'background-color': 'black'})
-
-modal = dbc.Modal(
-    [
-        dbc.ModalHeader("Header"),
-        dbc.ModalBody("This is the content of the modal"),
-        dbc.ModalFooter(
-            dbc.Button("Close", id="close", className="ml-auto")
-        ),
-    ],
-    id="modal",
-)
 
 toast_div1 = html.Div(id='toast1')
 toast_div2 = html.Div(id='toast2')
 
 # component to compile all the elements into single element
-row = html.Div(
+layout = html.Div(
     [
         dbc.Row(navbar),
-        dbc.Row(dbc.Col(dbc.Card(project_info, outline=True, color="primary", className="mb-3")),
-                style={'padding': '10px 40px 0px'}),
         dbc.Row(
             dbc.Col(
                 dbc.Card(
@@ -285,7 +257,7 @@ row = html.Div(
                             dbc.Row(
                                 [
                                     dbc.Col(dbc.Card(preprocess_flow, outline=True, color="info",
-                                                     style={'padding': '10px 40px 40px', 'height': '50rem',
+                                                     style={'padding': '10px 25px 40px', 'height': '50rem',
                                                             'overflowY': 'scroll'}), width=4, align="center"),
                                     dbc.Col(dataset_input_display, width=8),
                                 ]
@@ -293,29 +265,15 @@ row = html.Div(
                         )
                     ], outline=True, color="primary"
                 ),
-                style={'padding': '10px 55px 20px'}
+                style={'padding': '10px 40px 20px'}
             )
-        ),
-        dbc.Row(page_footer), dbc.Row(toast_div1),dbc.Row(toast_div2),
+        ),dbc.Row(toast_div1),dbc.Row(toast_div2),
+        dbc.Row(page_footer),
     ],
 )
 
-# Final layout element which is actually used by the app to show the layout.
-app.layout = row
 
-# app title
-app.title = 'Interactive Machine Learning Platform'
-
-
-# Callback to save Project Name
-@app.callback(Output('project_name_textbox', 'valid'), [Input('project_name_textbox', 'value')])
-def update_project_name(project_name):
-    if project_name is None:
-        return False
-    elif len(project_name) != 0:
-        project.create(project_name)
-        return True, False
-
+# CALLBACKS
 
 def construct_toast(header, message, status):
     toast = dbc.Toast(
@@ -582,6 +540,17 @@ def update_options(value, target_value, columns):
 
     return [{'label': i['name'], 'value': i['name']} for i in target_columns]
 
+@app.callback(Output('update_dataset_btn','style'),
+              [Input('update_dataset_btn','n_clicks')],
+              [State('table1','data')])
+def update_dataset(update, content):
+    print(update,content)
+    if update is not None and content is not None:
+        if update > 0:
+            project.dataset.df = pd.DataFrame(content)
+            print(project.dataset.df)
+            return {'color':'red'}
+
 
 # List of learning types
 learning_types = ['Supervised', 'Unsupervised']
@@ -594,7 +563,3 @@ algorithms = {"Supervised": [
 
 placeholders = ['','.','?','-1']
 missing_value_actions = ['Remove Rows With Missing Values','Fill Missing Values']
-
-# Running the dash server
-if __name__ == '__main__':
-    app.run_server(debug=True)
