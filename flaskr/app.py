@@ -30,7 +30,8 @@ def imlp():
 
 @app.route('/project/<project_name>')
 def new_project(project_name):
-    os.remove('/tmp/{}.log'.format(project_name))
+    if os.path.isfile('/tmp/{}.log'.format(project_name)):
+        os.remove('/tmp/{}.log'.format(project_name))
     file_handler = logging.FileHandler('/tmp/{}.log'.format(project_name))
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     file_handler.setFormatter(formatter)

@@ -14,40 +14,27 @@
   <script src="{{ url_for('static',filename='scripts/bbcafd632e.js') }}" crossorigin="anonymous"></script>
   <!--<script src="https://kit.fontawesome.com/bbcafd632e.js" crossorigin="anonymous"></script>--></head>
 	<script>
-		function dynamic() {
-			var supervised_part = document.getElementById("supervised");
-			supervised_part.style.visibility = "hidden";
-			document.getElementById('alg').style.visibility = "hidden";
-			document.getElementById('sub').style.visibility = "hidden";
-			if (document.getElementById('slearn').checked == true) {
-				document.getElementById('alg').style.visibility = "visible";
-				document.getElementById('supervised').style.visibility = "visible";
-				document.getElementById('sub').style.visibility = "visible";
-				var alg = document.getElementById('alg');
-				alg[0].innerHTML = "Random Forest";
-				alg[0].setAttribute('value','RF');
-				if (!alg[1]) {
-					var option = document.createElement('option');
-					option.text = "Support Vector Machines";
-					document.getElementById('alg').add(option);
-					alg[1].setAttribute('value','SVM');
-				}
-			}
-			if (document.getElementById('ulearn').checked == true) {
-				document.getElementById('alg').style.visibility = "visible";
-				document.getElementById('supervised').style.visibility = "hidden";
-				document.getElementById('sub').style.visibility = "visible";
-				var alg = document.getElementById('alg');
-				alg[0].value="KM";
-				alg[0].innerHTML="K Means Clustering";
-				alg.remove(1);
-
-			}
+		function supervised() {
+			var alg = document.getElementById('alg');
+			alg.options[0].value = "RF";
+			alg.options[0].innerHTML = 'Random Forest';
+			alg.options[1].value = "SVM";
+			alg.options[1].innerHTML = "Support Vector Machines";
+			document.getElementById('alg').removeAttribute("hidden");
+			document.getElementById('content').removeAttribute("hidden");
 		}
-
-		function execution() {
-			setInterval(dynamic,1);
+		
+		function unsupervised() {
+			var alg = document.getElementById('alg');
+			alg.options[0].value = "KM";
+			alg.options[0].innerHTML = "K Means";
+			alg.options[1].remove()
+			document.getElementById('alg').removeAttribute("hidden");			
+			document.getElementById('content').removeAttribute("hidden");
 		}
+		
+		
+			
 
     function myFunction() {
   var x = document.getElementById("myDIV");
@@ -195,26 +182,30 @@ tr:hover            { background-color: #ffff99;}
 <div class="container-fluid bg-4 text-center">
 <form name="form1" method="post" enctype="multipart/form-data">
 	<br><b>Select the type of learning algorithm</b><br>
-	<input type="radio" name="Learn_Method" value="Supervised" id="slearn">Supervised</input><br>
-	<input type="radio" name="Learn_Method" value="Unsupervised" id="ulearn">Unsupervised</input><br><br>
+	<input type="radio" name="Learn_Method" value="Supervised" id="slearn" onclick="supervised()">Supervised</input><br>
+	<input type="radio" name="Learn_Method" value="Unsupervised" id="ulearn" onclick="unsupervised()">Unsupervised</input><br><br>
 
-	<select name="Algorithm" id="alg" class="select">
+	<select name="Algorithm" id="alg" class="select" hidden>
 		<option value="RF" class="opt">Random Forest</option>
 		<option value="SVM" class="opt">Support Vector Machine</option>
 	</select><br><br>
 
-	<div id="supervised">
+	<div id="content" hidden>
 		<b>Use the list below to select features. They will be preprocessed</b><br>
-		{% for col in column_names %}
-			<input type="checkbox" name="features" value="{{col}}">{{ col }}</input><br>
-		{% endfor %}
-		<br><b>Use the list below to select the target class for prediction <br>(Selecting any one is Compulsory)</b><br>
-		{% for col in column_names %}
-				<input type="radio" name="target" value="{{col}}">{{col}}</input><br>
-			{% endfor %}<br><br>
+                {% for col in column_names %}
+                        <input type="checkbox" name="features" value="{{col}}">{{ col }}</input><br>
+                {% endfor %}
+                <br><b>Use the list below to select the target class for prediction <br>(Selecting any one is Compulsory)</b><br>
+                {% for col in column_names %}
+                                <input type="radio" name="target" value="{{col}}">{{col}}</input><br>
+                        {% endfor %}<br><br>
+	</div>
       <br><button type="submit" value="Submit" id="sub" class="far fa-arrow-alt-circle-right" style="width: auto; height: auto; background: transparent; border: none;"></button> <!-- to be linked to next page-->
 </form>
 	</div>
+</div>
+<div id="iframe" align="right">
+        <iframe src="http://localhost:5000/logs/{{proj_name}}" height="200" width="1000"></iframe>
 </div>
 
 <!-- Footer -->
