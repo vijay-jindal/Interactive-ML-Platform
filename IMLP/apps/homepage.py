@@ -6,15 +6,30 @@ from dash.dependencies import Input, Output, State
 from app import app,project
 
 # Project name input modal
+from dash.exceptions import PreventUpdate
+
+# Header bar
+navbar = dbc.NavbarSimple(
+    brand="Interactive ML Platform",
+    brand_style={'font-size':'20px'},
+    color="success",
+    dark=True, style={
+        'width': '100%',
+        'height': '7rem',
+        'text-size':'15px',
+        'verticalAlign': 'middle'
+    }
+)
+
 modal = dbc.Modal(
     [
         dbc.ModalHeader("Project Name"),
-        dbc.ModalBody([dbc.Input(id='project_name_input',placeholder="Enter Project Name", debounce=True),
+        dbc.ModalBody([dbc.Input(id='project_name_input',placeholder="Enter Project Name"),
                        ]),
         dbc.ModalFooter(
-            [dbc.Button("Cancel", id="close", className="ml-auto"),
-             dbc.Button("Create Project",href='/preprocess',
-                        id="create_project_btnx", className="ml-auto", n_clicks=0)]),
+            [dcc.Link(dbc.Button("Create Project",disabled=True,
+                        id="create_project_btnx", className="ml-auto", n_clicks=0,color='success'), id='link',style={'color':'green'},
+                      href='')]),
     ],
     id="project_info_modal",
 )
@@ -22,18 +37,18 @@ modal = dbc.Modal(
 # component to compile all the elements into single element
 layout = html.Div(
     [
+        dbc.Row(navbar),
         dbc.Col(
             [
-                dbc.Row(html.H1("IMLP", style={'align': 'center','width':'100%'})),
-                dbc.Row(html.H2("This is a Interactive Machine Learning"
+                dbc.Row(html.H2("This is an Interactive Machine Learning "
                                     "Platform", id='project_description',
                                     style={'align': 'center','width':'100%'})),
-                dbc.Row(html.Button("Create Project",
-                                        id='create_project_btn',
+                dbc.Row(dbc.Button("Create Project",
+                                        id='create_project_btn',outline=True,color='success',
                                         style={'align': 'center','width':'100%'}, n_clicks=0)),
                 html.Br(),
-                dbc.Row(html.Button("Open Exisiting Project",
-                                        id='open_project_btn',
+                dbc.Row(dbc.Button("Open Existing Project",
+                                        id='open_project_btn',outline=True,color='success',
                                         style={'align': 'center','width':'100%'})),
                 dbc.Row(modal)],style={'padding': '10px 55px 20px','align':'center','width':'100%'}),
     ])
@@ -46,15 +61,21 @@ def create_project(n_click):
     if n_click > 0:
         return True
 
+@app.callback([Output('project_name_input', 'invalid'),Output('create_project_btnx','disabled'),Output('link','href')],
+              [Input('project_name_input','value')])
+def project_name(project_name):
+    # project name validation. If fails, shows a valid or invalid remark on the component
+    if project_name is None:
+        raise PreventUpdate
+    elif len(project_name) == 0:
+        return [],True,''
+    else:
+        return False,False,'/preprocess'
 
-# Takes the project name from the modal input and makes instance of Project
-@app.callback(Output('project_name_input', 'invalid'),
-              [Input('create_project_btnx', 'n_clicks'),Input('project_name_input', 'value')])
-def project_name_in(n_clicks, project_name):
-    if n_clicks > 0:
-        # project name validation. If fails, shows a valid or invalid remark on the component
-        if project_name is None or len(project_name)==0:
-            return True
-        else:
-            project.create(project_name)
-            return False
+@app.callback(Output('create_project_btnx','style'),
+              [Input('create_project_btnx','n_clicks')],[State('project_name_input','value')])
+def create_project(click,project_name):
+    if click > 0 and project_name is not None:
+        project.create(project_name)
+    else:
+        raise PreventUpdate

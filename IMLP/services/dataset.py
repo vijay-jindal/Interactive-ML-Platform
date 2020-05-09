@@ -29,9 +29,6 @@ class Dataset:
     def missing_value_indicator(self, placeholders):
         # Create a new column in df1 to indicate if a row has missing values as per defined placeholders
         # References : https://stackoverflow.com/q/50845987
-        print(placeholders)
-        print(self.df['fixed acidity'])
         x = self.df.astype(str).apply((lambda row, placeholders=placeholders: "true" if any(
             placeholder == field for field in row for placeholder in placeholders) else "false"), axis=1)
-        print(x)
         return x

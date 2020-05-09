@@ -19,6 +19,9 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', dbc.themes
 
 # Creating object of Dash
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+# app title
+app.title = 'Interactive Machine Learning Platform'
+
 app.logger.setLevel(logging.INFO)
 server = app.server
 # Since we're adding callbacks to elements that don't exist in the app.layout,
