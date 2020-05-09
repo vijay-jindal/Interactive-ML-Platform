@@ -128,10 +128,10 @@ class Model(object):
             return params, 0
 
     def set_params(self, params):
-        self.set_split_ratio(float(params.pop('split_ratio',None)))
         try:
             processed_params, status = self.process_params(params)
             if status == 1:
+                processed_params['verbose'] = 100
                 self.classifier.set_params(**processed_params)
                 print(self.parameters)
                 return 1
