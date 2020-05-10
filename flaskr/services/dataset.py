@@ -18,3 +18,9 @@ class Dataset:
     def set_target(self, list):
         self.y = self.df[list].copy()
         self.app.logger.info(self.y)
+
+    def get_features(self):
+        return self.X
+
+    def get_target(self):
+        return self.y

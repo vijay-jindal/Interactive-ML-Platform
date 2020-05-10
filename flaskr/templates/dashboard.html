@@ -8,9 +8,13 @@
   <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static',filename='css/font.css') }}" rel="stylesheet">
   <link href="{{ url_for('static',filename='css/styles.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='css/all.css') }}" rel="stylesheet">
   <script src="{{ url_for('static',filename='scripts/bootstrap.min.js') }}"></script>
   <script src="{{ url_for('static',filename='scripts/jquery.min.js') }}"></script>
-  <script src="https://kit.fontawesome.com/bbcafd632e.js" crossorigin="anonymous"></script></head>
+  <script src="{{ url_for('static',filename='scripts/bbcafd632e.js') }}" crossorigin="anonymous"></script>
+  <!-- <script src="{{ url_for('static',filename='scripts/all.js') }}"></script> -->
+  <!--<script src="https://kit.fontawesome.com/bbcafd632e.js" crossorigin="anonymous"></script>-->
+</head>
 
   <style media="screen">
   button {
@@ -44,8 +48,6 @@ Kindly enter the name of the Project
   <label for="project-name">Project Name: </label>
   <input type="text" id="project-name" name="project-name" class="input-text">
   <button type="submit" value="Submit" class="far fa-arrow-alt-circle-right" onclick='window.location.href="project/".concat(document.getElementById("project-name").value);'></button>
-  </form>
-
 </div>
 
 <!-- Third Container (Grid) -->

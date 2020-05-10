@@ -7,9 +7,12 @@
   <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static',filename='css/font.css') }}" rel="stylesheet">
   <link href="{{ url_for('static',filename='css/styles.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='css/all.css') }}" rel="stylesheet">
+  <!--<script src="{{ url_for('static',filename='scripts/all.js') }}"></script>-->
   <script src="{{ url_for('static',filename='scripts/bootstrap.min.js') }}"></script>
   <script src="{{ url_for('static',filename='scripts/jquery.min.js') }}"></script>
-  <script src="https://kit.fontawesome.com/bbcafd632e.js" crossorigin="anonymous"></script></head>
+  <script src="{{ url_for('static',filename='scripts/bbcafd632e.js') }}" crossorigin="anonymous"></script>
+  <!--<script src="https://kit.fontawesome.com/bbcafd632e.js" crossorigin="anonymous"></script>--></head>
 	<style>
 	input.file {
 	  position: relative;
@@ -70,24 +73,34 @@
 	</div>
 
 	<div class="container-fluid bg-2 text-center">
-		<h2>Edit Default Parameters</h2><br>
-		<table align="center" class="param">
-			<tr>
-				<th>PARAMETER</th>
-				<th>DEFAULT VALUE</th>
-			</tr>
-		{% for key in def_params.keys() %}
+		<form name="default_params" id="def_params" method="post" enctype="multipart/form-data">
+			<h2>Edit Default Parameters</h2><br>
+			<table align="center" class="param">
 				<tr>
-					<td> {{ key }} </td>
-					<td><input type="text" value={{ def_params[key] }} name="{{ key }}" /></td>
+					<th>PARAMETER</th>
+					<th>VALUE</th>
 				</tr>
-		{% endfor %}
-		</table>
-		<form class="" action="#" method="post">
-			<br><button type="submit" value="Submit" id="sub" class="far fa-arrow-alt-circle-left" style="width: auto; height: auto; background: transparent; border: none;"></button> <!-- to be linked to next page-->
-		</form>
-		<form class="" action="#" method="post">
-			<button type="submit" value="Submit" id="sub" class="far fa-arrow-alt-circle-right" style="width: auto; height: auto; background: transparent; border: none;"></button> <!-- to be linked to next page-->
+				{% for k,v in def_params.items() %}
+					<tr>
+						<td> {{ k }} </td>
+						{% if 'string' in v['param_values'] and v['param_values']['string']|length > 0 %}
+							<td><input type="text" name="{{ k }}" list="{{ k }}" value="{{ v['default'] }}"></td>
+							<datalist id="{{ k }}" >
+						   		{% for value in v['param_values']['string'] %}
+									<option> {{ value }}
+								{% endfor %}
+							</datalist>
+						{% else %}
+							<td><input type="text" name="{{ k }}" value="{{ v['default'] }}"></input></td>
+						{% endif %}
+					</tr>
+				{% endfor %}
+       <tr>
+         <td>Split-Ratio</td>
+         <td><input type="text" name="split_ratio" value="0.2"></input></td>
+       </tr>
+			</table>
+		<input type="submit" value="Submit" style="background-color:black;"/>
 		</form>
 	</div>
 	</body>

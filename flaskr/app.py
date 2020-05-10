@@ -17,40 +17,46 @@ app = Flask(__name__)
 project = Project(app)
 
 import logging
+
 app.logger.setLevel(logging.INFO)
+
 
 @app.route('/')
 def imlp():
     return render_template('dashboard.html')
 
+
 @app.route('/project/<project_name>')
 def new_project(project_name):
     project.create(project_name)
-    return redirect('/project/'+project_name+'/upload')
+    return redirect('/project/' + project_name + '/upload')
 
-@app.route('/project/<project_name>/upload', methods=['GET','POST'])
+
+@app.route('/project/<project_name>/upload', methods=['GET', 'POST'])
 def upload(project_name):
     if request.method == 'GET':
-        if hasattr(project,"name") and project_name == getattr(project,"name"):
-            return render_template('upload-csv.html',proj_name=project_name)
+        if hasattr(project, "name") and project_name == getattr(project, "name"):
+            return render_template('upload-csv.html', proj_name=project_name)
         else:
             return redirect('/')
     elif request.method == 'POST' and 'dataset' in request.files:
-        project.upload_dataset(request.files['dataset']) # allow only csv files in UI and backend
+        project.upload_dataset(request.files['dataset'])  # allow only csv files in UI and backend
         # TODO : create instance of dataset class
-        return redirect('/project/'+project_name+'/preprocess')
+        return redirect('/project/' + project_name + '/preprocess')
     else:
         return redirect('/')
 
-@app.route('/project/<project_name>/preprocess', methods=['GET','POST'])
+
+@app.route('/project/<project_name>/preprocess', methods=['GET', 'POST'])
 def preprocess(project_name):
     if request.method == 'GET':
-        if hasattr(project,"name") and project_name == getattr(project,"name") and hasattr(project,"dataset"):
-            column_names,data_types = project.dataset.info()
+        if hasattr(project, "name") and project_name == getattr(project, "name") and hasattr(project, "dataset"):
+            column_names, data_types = project.dataset.info()
             app.logger.info(column_names)
             app.logger.info(data_types)
             app.logger.info(project.dataset.path)
-            return render_template('preprocess.html',path=project.dataset.path,column_names=column_names,data_types=data_types,proj_name=project_name)
+            return render_template('preprocess.html', path=project.dataset.path, column_names=column_names,
+                                   data_types=data_types, proj_name=project_name, data=project.dataset.df.to_html())
         else:
             return redirect('/')
     elif request.method == 'POST':
@@ -70,7 +76,7 @@ def preprocess(project_name):
             y = request.form.get('target')
             project.dataset.set_features(X)
             project.dataset.set_target(y)
-            return redirect('/project/'+project_name+'/model')
+            return redirect('/project/' + project_name + '/model')
         elif learn_method == "Unsupervised":
             return "WIP"
         else:
@@ -78,12 +84,15 @@ def preprocess(project_name):
     else:
         return redirect('/')
 
-@app.route('/project/<project_name>/model', methods=['GET','POST'])
+
+@app.route('/project/<project_name>/model', methods=['GET', 'POST'])
 def model(project_name):
     if request.method == 'GET':
-        if hasattr(project,"name") and project_name == getattr(project,"name") and hasattr(project,"dataset") and hasattr(project,"model"):
+        if hasattr(project, "name") and project_name == getattr(project, "name") and hasattr(project,
+                                                                                             "dataset") and hasattr(
+                project, "model"):
             # Send default parameters available for the model to frontend
-            return render_template('default_params.html',def_params=project.model.get_params(),proj_name=project_name)
+            return render_template('default_params.html', def_params=project.model.get_params(), proj_name=project_name)
         else:
             return redirect('/')
     elif request.method == 'POST':
@@ -92,9 +101,14 @@ def model(project_name):
         # 0.20 means 20% data will be for validation (test)
         # Also consider possibility of complete training
         # Show realtime messages from training (set verbose flag in model)
-        return redirect('/project/'+project_name+'/prediction')
+        set_params_response = project.model.set_params(request.form.to_dict())
+        if set_params_response == 1:
+            return redirect('/project/'+project_name+'/prediction')
+        else:
+            return "{}".format(set_params_response)
     else:
         return redirect('/')
+
 
 @app.route('/project/<project_name>/prediction')
 def prediction(project_name):
@@ -103,7 +117,8 @@ def prediction(project_name):
     # Show classification report
     # above to be shown from sklearn metrics
     # Visualizations
-    return("Hi there {name}, this WIP".format(name="developer"))
+    # return("Hi there {name}, this WIP".format(name="developer"))
+    return (project.model.model_train())
 
 
 if __name__ == '__main__':
