@@ -1,5 +1,5 @@
 import dash
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -26,23 +26,51 @@ navbar = dbc.NavbarSimple(
     }
 )
 
+interpreter = html.Iframe(src="https://repl.it/repls/PurpleHeavyRuntimes?lite=true",
+            style={'width': "100%",
+                   'height': "1000",
+                   'frameborder': "0",
+                   'marginwidth': "0",
+                   'marginheight': "0", 'allowfullscreen': 'true'},
+            id='interpreter',
+            height=500),
 
-layout = html.Div([navbar,
-    html.H1('Data Visualization', style={'text-align': 'center'}),
-    dcc.Dropdown(id='graphs_list', searchable=False, placeholder="Select the graph", value='GRAPH'),
-    html.Label(
+interpreter_collapse = html.Div(
+                    [
+                        dbc.Button(
+                            "Use Python Terminal for EDA",
+                            id="interpreter-btn",
+                            className="mb-3",
+                            color='primary', style={'width': '100%'}
+                        ),
+                        dbc.Collapse(interpreter,id='interpreter_collapse')])
+
+
+layout = html.Div([
+    navbar,
+    html.Div([
+    html.H1('Exploratory Data Analysis (EDA)', style={'text-align': 'center'}),
+    dbc.Card( dbc.CardBody([
+        dcc.Dropdown(id='graphs_list', searchable=False, placeholder="Select the graph", value='GRAPH'),
+        html.Label(
         [
             "Multi dynamic Dropdown",
             dcc.Dropdown(id="columns", multi=True),
-        ]),html.Button('Display Graph', id='display', n_clicks=0),html.Iframe(src="https://repl.it/repls/PurpleHeavyRuntimes?lite=true",
-                                                                       style={'width':"100%",
-                                                                       'height':"1000",
-                                                                       'frameborder':"0",
-                                                                       'marginwidth':"0",
-                                                                       'marginheight':"0",'allowfullscreen':'true'},id='interpreter',height=500),
-    html.Div(id='graph',
-             children='')
-], style={'columnCount': 1, 'text-align': 'center'})
+        ]),
+                   html.Button('Display Graph', id='display', n_clicks=0),
+                   html.Div(id='graph',children=''),html.Br(),interpreter_collapse]),outline=True, color='success',
+style={'padding': '20px 30px 20px'}
+    )], style={'columnCount': 1, 'text-align': 'center','padding': '20px 30px 20px'})])
+
+
+
+@app.callback(Output('interpreter_collapse','is_open'),
+              [Input('interpreter-btn','n_clicks')],
+              [State("interpreter_collapse", "is_open")])
+def open_details(n,is_open):
+    if n:
+        return not is_open
+    return is_open
 
 
 @app.callback(

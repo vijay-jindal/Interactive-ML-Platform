@@ -6,6 +6,7 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 import re
+import pandas as pd
 
 class Model(object):
     """docstring for Model."""
@@ -159,8 +160,8 @@ class Model(object):
         self.classifier.fit(X_train, Y_train)
         self.app.logger.info("Model Training done.")
         predictions = self.classifier.predict(X_test)
-        acc_score = self.compute_accuracy(predictions, Y_test)
-        return "Model Trained with accuracy {}.".format(acc_score)
+        acc_score,confusion,classify_report = self.compute_accuracy(predictions, Y_test)
+        return acc_score,confusion,classify_report
 
     def compute_accuracy(self, predictions, Y_test):
         acc_score = accuracy_score(Y_test, predictions)
@@ -168,4 +169,4 @@ class Model(object):
         self.app.logger.info(acc_score)
         self.app.logger.info(confusion_matrix(Y_test, predictions))
         self.app.logger.info(classification_report(Y_test, predictions))
-        return acc_score
+        return acc_score,confusion_matrix(Y_test, predictions),pd.DataFrame(classification_report(Y_test, predictions,output_dict=True)).transpose()

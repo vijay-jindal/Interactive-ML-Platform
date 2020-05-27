@@ -15,7 +15,9 @@ import logging
 from services.project import Project
 # Setting styles and css
 # TODO : use assets folder to load css
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', dbc.themes.BOOTSTRAP]
+FONT_AWESOME = "https://use.fontawesome.com/releases/v5.10.2/css/all.css"
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', dbc.themes.BOOTSTRAP, FONT_AWESOME]
+
 
 # Creating object of Dash
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)

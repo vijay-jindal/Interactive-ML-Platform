@@ -24,13 +24,14 @@ navbar = dbc.NavbarSimple(
 modal = dbc.Modal(
     [
         dbc.ModalHeader("Project Name"),
-        dbc.ModalBody([dbc.Input(id='project_name_input',placeholder="Enter Project Name"),
+        dbc.ModalBody([dbc.Input(id='project_name_input',placeholder="Enter Project Name",bs_size="lg",style={'font-size':'20px'},className="mb-3"),
+
                        ]),
         dbc.ModalFooter(
             [dcc.Link(dbc.Button("Create Project",disabled=True,
                         id="create_project_btnx", className="ml-auto", n_clicks=0,color='success'), id='link',style={'color':'green'},
                       href='')]),
-    ],
+    ],size="lg",
     id="project_info_modal",
 )
 
@@ -43,12 +44,12 @@ layout = html.Div(
                 dbc.Row(html.H2("This is an Interactive Machine Learning "
                                     "Platform", id='project_description',
                                     style={'align': 'center','width':'100%'})),
-                dbc.Row(dbc.Button("Create Project",
-                                        id='create_project_btn',outline=True,color='success',
+                dbc.Row(dbc.Button("Create Project",className="mr-1",
+                                        id='create_project_btn',outline=True,color='success',size='lg',
                                         style={'align': 'center','width':'100%'}, n_clicks=0)),
                 html.Br(),
-                dbc.Row(dbc.Button("Open Existing Project",
-                                        id='open_project_btn',outline=True,color='success',
+                dbc.Row(dbc.Button("Open Existing Project",className="mr-1",
+                                        id='open_project_btn',outline=True,color='success',size='lg',
                                         style={'align': 'center','width':'100%'})),
                 dbc.Row(modal)],style={'padding': '10px 55px 20px','align':'center','width':'100%'}),
     ])
@@ -72,10 +73,11 @@ def project_name(project_name):
     else:
         return False,False,'/preprocess'
 
-@app.callback(Output('create_project_btnx','style'),
+@app.callback(Output('create_project_btnx','color'),
               [Input('create_project_btnx','n_clicks')],[State('project_name_input','value')])
 def create_project(click,project_name):
     if click > 0 and project_name is not None:
         project.create(project_name)
+        return 'success'
     else:
         raise PreventUpdate

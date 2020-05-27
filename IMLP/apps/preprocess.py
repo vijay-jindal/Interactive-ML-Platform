@@ -38,9 +38,9 @@ navbar = dbc.NavbarSimple(
         dcc.Link(dbc.Button(
             "Exploratory Data Analysis (EDA)",
             id="eda_btn",
-            className="mb-3",outline=True,
-            color="dark",style={'width':'100%','font-size':'10px'}),href="/eda")
-        ],
+            className="mb-3", outline=True,
+            color="dark", style={'width': '100%', 'font-size': '10px'}), href="/eda")
+    ],
     dark=True, style={
         'width': '100%',
         'height': '7rem',
@@ -69,42 +69,9 @@ upload_dataset = dcc.Upload(
         'margin': '10px', 'vertical-align': 'middle'
     })
 
-# dropdown to take input of learning type
-learning_type_dropdown = dcc.Dropdown(id='learning_type', searchable=False, placeholder="Select the Learning type",
-                                      style=dict(
-                                          width='100%',
-                                          verticalAlign="middle"
-                                      ))
-# dropdown to take input of algorithm name
-algorithm_type_dropdown = dcc.Dropdown(id='algorithm_name', searchable=False, placeholder="Select the Algorithm",
-                                       style=dict(
-                                           width='100%',
-                                           verticalAlign="middle"
-                                       ))
-# Label to tell user to select split ratio
-split_ratio_label = html.Label('Select the Split Ratio',
-                               style=dict(
-                                   width='100%',
-                                   verticalAlign="middle"
-                               ))
-# Slider to select the percentage of test sata
-split_ratio_slider = html.Div(dcc.Slider(id='split_ratio', min=0, max=100, step=5, value=20),
-                              style={'height': '10px', 'width': '100%'}),
-# Div to show the train and test percentage
-split_ratio_value = html.Div(id='split_ratio_value', style=dict(
-    width='100%',
-    verticalAlign="middle", textAlign="center"
-))
-
-# dropdown to select features
-features_dropdown = dcc.Dropdown(id="feature_column", multi=True, placeholder='Select Feature Columns', style=dict(
-    width='100%',
-    verticalAlign="middle"))
-# dropdown to select target feature
-target_dropdown = dcc.Dropdown(id='target_column', searchable=False, placeholder="Select the Target Column", style=dict(
-    width='100%',
-    verticalAlign="middle"
-))
+update_btn_tooltip = dbc.Tooltip("Clicking this button will update the data and this step is not reversible!!",
+                                 target="update_dataset_btn",
+                                 ),
 
 missing_value_collapse = html.Div(
     [
@@ -112,56 +79,57 @@ missing_value_collapse = html.Div(
             "Missing Values",
             id="missing-value-button",
             className="mb-3",
-            color='primary',style={'width':'100%'}
+            color='primary', style={'width': '100%'}
         ),
         dbc.Collapse(
             dbc.Card(dbc.CardBody([
-                 dcc.Dropdown(id="placeholders", multi=True, placeholder='Select placeholders', style=dict(
+                dcc.Dropdown(id="placeholders", multi=True, placeholder='Select placeholders', style=dict(
                     width='100%',
-                    verticalAlign="middle")),breakline,
+                    verticalAlign="middle")), breakline,
                 dbc.Button(
                     "Find Missing Values",
-                    id="check-missing-value-button",outline=True,
-                    className="mb-3",n_clicks=0,
+                    id="check-missing-value-button", outline=True,
+                    className="mb-3", n_clicks=0,
                     color='success', style={'width': '100%'}
-                ),breakline,
-                dcc.Dropdown(id="missing-value-action-dropdown", multi=False, placeholder='Select Action for Missing Values', style=dict(
-                    width='100%',
-                    verticalAlign="middle")),breakline,
+                ), breakline,
+                dcc.Dropdown(id="missing-value-action-dropdown", multi=False,
+                             placeholder='Select Action for Missing Values', style=dict(
+                        width='100%',
+                        verticalAlign="middle")), breakline,
                 html.Div(
                     [
                         dbc.Col(
                             [
                                 dbc.Button(
                                     "APPLY",
-                                    id="apply_btn",color='success',
+                                    id="apply_btn", color='success',
                                     outline=True,
-                                    className="mb-3",n_clicks=0,
+                                    className="mb-3", n_clicks=0,
                                     style={'width': '100%'})
                             ],
-                            id='apply_col',style={'width':'auto'}),
+                            id='apply_col', style={'width': 'auto'}),
                         dbc.Col([
-                                dbc.Button(
-                                    "REVERT",
-                                    id="cancel_btn",color='danger',
-                                    className="mb-3", n_clicks=0,
-                                    outline=True,
-                                    style={'width': '100%'})
-                        ],id='cancel_col',style={'width':'auto'}),
+                            dbc.Button(
+                                "REVERT",
+                                id="cancel_btn", color='danger',
+                                className="mb-3", n_clicks=0,
+                                outline=True,
+                                style={'width': '100%'})
+                        ], id='cancel_col', style={'width': 'auto'}),
                         dbc.Col([
-                                dbc.Button(
-                                    "UPDATE DATASET",
-                                    id="update_dataset_btn",color='danger',
-                                    className="mb-3", n_clicks=0,
-                                    outline=True,block=True,
-                                    style={'width': '100%'})
+                            dbc.Button(
+                                "UPDATE DATASET",
+                                id="update_dataset_btn", color='danger',
+                                className="mb-3", n_clicks=0,
+                                outline=True, block=True,
+                                style={'width': '100%'}),
                         ], id='update_col', style={'width': 'auto'}),
                     ],
-                id='apply_or_cancel',style={'display':'none'}),breakline,
-    ])),
+                    id='apply_or_cancel', style={'display': 'none'}), breakline,
+            ])),
             id="missing_value",
         ),
-    ],style={'width':'100%'}
+    ], style={'width': '100%'}
 )
 
 duplicate_column_collapse = html.Div(
@@ -170,92 +138,75 @@ duplicate_column_collapse = html.Div(
             "Duplicate Columns",
             id="duplicate-column-button",
             className="mb-3",
-            color='primary',style={'width':'100%'}
+            color='primary', style={'width': '100%'}
         ),
         dbc.Collapse(
             dbc.Card(dbc.CardBody([breakline,
-                 dcc.Dropdown(id="duplicate-columns", multi=True, placeholder='Select columns', style=dict(
-                    width='100%',
-                    verticalAlign="middle")),breakline,
-                dbc.Button(
-                    "Find Duplicate columns",
-                    id="find-duplicate-columns",
-                    className="mb-3",n_clicks=0,
-                    color='success', style={'width': '100%'}
-                ),breakline,
-                dcc.Dropdown(id="duplicate-column-action-dropdown", multi=False, placeholder='Select Action for Duplicate Columns', style=dict(
-                    width='100%',
-                    verticalAlign="middle")),breakline,
+                                   dcc.Dropdown(id="duplicate-columns", multi=True, placeholder='Select columns',
+                                                style=dict(
+                                                    width='100%',
+                                                    verticalAlign="middle")), breakline,
+                                   dbc.Button(
+                                       "Find Duplicate columns",
+                                       id="find-duplicate-columns",
+                                       className="mb-3", n_clicks=0,
+                                       color='success', style={'width': '100%'}
+                                   ), breakline,
+                                   dcc.Dropdown(id="duplicate-column-action-dropdown", multi=False,
+                                                placeholder='Select Action for Duplicate Columns', style=dict(
+                                           width='100%',
+                                           verticalAlign="middle")), breakline,
 
-            ])),
+                                   ])),
             id="duplicate_columns",
         ),
-    ],style={'width':'100%'}
+    ], style={'width': '100%'}
 )
 
 finish_preprocessing_button = dbc.Button(
-                            "FINISH PREPROCESSING",
-                            id="finish-preprocessing-button",
-                            className="mb-3",
-                            color='success', style={'width': '100%'}
-                        ),
-
+    "FINISH PREPROCESSING",
+    id="finish-preprocessing-button",
+    className="mb-3",
+    color='success', style={'width': '100%'}
+),
 
 # Tabs to do perform various preprocessing steps independently by the user
 process_tabs = dcc.Tabs(id='preprocess_tabs', value='tab-1', children=[
     dcc.Tab(label='Pre-process functions', value='tab-1', children=
     [
-        dbc.CardBody([
-            dbc.Row(breakline),
-        dbc.Row(missing_value_collapse),
-
-        dbc.Row(duplicate_column_collapse)])
-    ],),
-    dcc.Tab(label='Pre-process Attributes', value='tab-2',children=[
-        dbc.CardBody(
-            [
-        dbc.Row(breakline),
-        dbc.Row(learning_type_dropdown),
-        dbc.Row(breakline),
-        dbc.Row(algorithm_type_dropdown),
-        dbc.Row(breakline),
-        dbc.Row(features_dropdown),
-        dbc.Row(breakline),
-        dbc.Row(target_dropdown),
-        dbc.Row(breakline),
-        dbc.Row(split_ratio_label),
-        dbc.Row(split_ratio_slider),
-        dbc.Row(breakline),
-        dbc.Row(split_ratio_value),
-        dbc.Row(breakline),
-        dbc.Row(finish_preprocessing_button)
-    ])],)
-], style = {
+    ])
+], style={
     'height': '80px', 'width': '330px'
 }),
 
 # Datatable to show the dataset to the user
 # TODO: Pagination page number text box width to be increased
-datatable_before_apply = dash_table.DataTable(id='table1', css=[{'selector': '.row', 'rule': 'margin: 0'},{"selector": ".show-hide", "rule": "display: none"}],
-                                 columns=[{"name": i, "id": i} for i in df],
-                                 data=df.to_dict('records'),
-                                 page_size=13,
-                                 page_action="native",
-                                 page_current=0,
-                                 style_table={'overflowX': 'auto', 'display': 'block'})
-
-
+datatable_before_apply = dash_table.DataTable(id='table1', css=[{'selector': '.row', 'rule': 'margin: 0'},
+                                                                {"selector": ".show-hide", "rule": "display: none"}],
+                                              columns=[{"name": i, "id": i} for i in df],
+                                              data=df.to_dict('records'),
+                                              page_size=13,
+                                              page_action="native",
+                                              page_current=0,
+                                              style_table={'overflowX': 'auto', 'display': 'block'})
 # Cardbody component to compile all preprocessing elements into single component
 preprocess_flow = [
     dbc.CardBody(
         [
-            dbc.Row(process_tabs),
+            dbc.Row(html.Div("Preprocessing Steps")),
+            dbc.Row(dbc.CardBody([
+            dbc.Row(breakline),
+            dbc.Row(missing_value_collapse),
+            dbc.Row(duplicate_column_collapse),
+            dbc.Row(finish_preprocessing_button)
+            ])
+),
         ])]
 
 # Cardbody component to compile dataset upload and view into single component
 dataset_input_display = dbc.Card(
     dbc.CardBody(
-        [upload_dataset,datatable_before_apply], style={'height': '57rem'}
+        [upload_dataset, datatable_before_apply], style={'height': '57rem'}
     ), outline=True, color="info"
 )
 
@@ -272,7 +223,7 @@ finish_warning_modal = dbc.Modal(
         dbc.ModalBody([dbc.Label("One or more fields have NOT been selected"),
                        ]),
         dbc.ModalFooter(
-            [dbc.Button("Close", id="close", className="ml-auto"),]),
+            [dbc.Button("Close", id="close", className="ml-auto"), ]),
     ],
     id="preprocessing_modal",
 )
@@ -285,8 +236,9 @@ layout = html.Div(
             dbc.Col(
                 dbc.Card(
                     [
-                        dbc.CardHeader("DATA PREPROCESING",
-                                       style={'font-family': 'Times New Roman', 'font-size': '15px','color':'white','background-color':'green'}),
+                        dbc.CardHeader("DATA PRE-PROCESSING",
+                                       style={'font-family': 'Times New Roman', 'font-size': '15px', 'color': 'white',
+                                              'background-color': 'green'}),
                         dbc.CardBody(
                             dbc.Row(
                                 [
@@ -301,7 +253,7 @@ layout = html.Div(
                 ),
                 style={'padding': '10px 40px 20px'}
             )
-        ),dbc.Row(toast_div1),dbc.Row(toast_div2),html.Div(id='linkx'),
+        ), dbc.Row(toast_div1), dbc.Row(toast_div2), html.Div(id='linkx'),
 
     ],
 )
@@ -324,8 +276,8 @@ def construct_toast(header, message, status):
 
 
 @app.callback(Output("toast1", "children"),
-              [Input('upload-data', 'filename')],[State('upload-data', 'contents')])
-def show_toast(filename,contents):
+              [Input('upload-data', 'filename')], [State('upload-data', 'contents')])
+def show_toast(filename, contents):
     if filename is None:
         return None
     elif hasattr(project, "dataset") and contents is not None:
@@ -344,20 +296,20 @@ start = 0
 # this callback is triggered when the dropdown for the missing value action is altered.
 # this style of dropdown for missing values is changed at every button click in the preprocess stage and hence it
 # keeps updating cancel and apply button all the time.
-@app.callback([Output('cancel_col','style'),Output('apply_col','style')],
-             [Input('missing-value-action-dropdown','options')])
+@app.callback([Output('cancel_col', 'style'), Output('apply_col', 'style')],
+              [Input('missing-value-action-dropdown', 'options')])
 def apply_action(click):
     global apply_cancel
     if apply_cancel == 0:
         # CANCEL
         # print("Apply value is cancel",start,apply_cancel)
         apply_cancel = 1
-        return {'display':'none'},{'display':'block'}
+        return {'display': 'none'}, {'display': 'block'}
     elif apply_cancel == 1:
         # APPLY
         # print("Apply value is apply",start,apply_cancel)
         apply_cancel = 0
-        return {'display':'block'},{'display':'none'}
+        return {'display': 'block'}, {'display': 'none'}
 
 
 # callback to take dataset from user and display it in the datatable
@@ -367,14 +319,14 @@ def apply_action(click):
                Output("table1", "style_data_conditional"),
                Output("table1", "hidden_columns"),
                Output("toast2", "children"),
-               Output('missing-value-action-dropdown','options'),
-               Output('missing-value-action-dropdown','style')],
+               Output('missing-value-action-dropdown', 'options'),
+               Output('missing-value-action-dropdown', 'style')],
               [Input('upload-data', 'contents'),
-               Input('check-missing-value-button','n_clicks'),
-               Input('apply_btn','n_clicks'),Input('cancel_btn','n_clicks')],
+               Input('check-missing-value-button', 'n_clicks'),
+               Input('apply_btn', 'n_clicks'), Input('cancel_btn', 'n_clicks')],
               [State('upload-data', 'filename'),
-               State('placeholders','value'),State("table1", "data")])
-def update_output(content,missing_clicks,apply_click,cancel_click, name,value,datatableData):
+               State('placeholders', 'value'), State("table1", "data")])
+def update_output(content, missing_clicks, apply_click, cancel_click, name, value, datatableData):
     global place_values
     global missing_val_click
     global apply_cancel
@@ -386,9 +338,10 @@ def update_output(content,missing_clicks,apply_click,cancel_click, name,value,da
                                                                                    'vertical-align': 'middle',
                                                                                    'width': '100%', 'height': '470px',
                                                                                    'lineHeight': '20px',
-                                                                                   'textAlign': 'center'}, construct_toast("ERROR",
-                                   "Please Enter a project name and upload dataset",
-                                   "danger"), None, None, [], {
+                                                                                   'textAlign': 'center'}, construct_toast(
+            "ERROR",
+            "Please Enter a project name and upload dataset",
+            "danger"), None, None, [], {
                    'display': 'none'}
 
     if value is not None:
@@ -411,9 +364,9 @@ def update_output(content,missing_clicks,apply_click,cancel_click, name,value,da
                    construct_toast("Dataset Info",
                                    "Found {} missing values.\nRows with missing values are highlighted.".format(
                                        len(df[df['missing-values'] == "true"].index)),
-                                   "danger"),\
-                   [{"label": action, "value": action} for action in missing_value_actions],\
-                   { 'width':'100%','display':"block"}
+                                   "danger"), \
+                   [{"label": action, "value": action} for action in missing_value_actions], \
+                   {'width': '100%', 'display': "block"}
 
         # if placeholders do not change, check if apply or cancel button is clicked.
         # start is used to see, if the dataset is uploaded or not.
@@ -425,24 +378,25 @@ def update_output(content,missing_clicks,apply_click,cancel_click, name,value,da
                 df1 = pd.DataFrame(datatableData)
                 df = df1[df1['missing-values'] == "false"].drop(columns='missing-values')
                 return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
-                    'display': 'none'}, None,None, construct_toast("Missing rows delete",
-                                   "Deleted {} rows with missing values.".format(
-                                       len(df1[df1['missing-values'] == "true"].index)),
-                                   "danger"),\
-                   [{"label": action, "value": action} for action in missing_value_actions],\
-                   { 'width':'100%','display':"block"}
+                    'display': 'none'}, None, None, construct_toast("Missing rows delete",
+                                                                    "Deleted {} rows with missing values.".format(
+                                                                        len(df1[df1[
+                                                                                    'missing-values'] == "true"].index)),
+                                                                    "danger"), \
+                       [{"label": action, "value": action} for action in missing_value_actions], \
+                       {'width': '100%', 'display': "block"}
 
             # if apply_cancel = 0 , it is always cancel button clicked.
             elif apply_cancel == 0:
                 # print("Cancel button clicked",apply_cancel)
                 df = pd.DataFrame(project.dataset.df)
                 return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
-                    'display': 'none'}, None,None, construct_toast("Missing rows delete",
-                                   "Restored {} rows with missing values.".format(
-                                       len(df[df['missing-values'] == "true"].index)),
-                                   "danger"),\
-                   [{"label": action, "value": action} for action in missing_value_actions],\
-                   { 'width':'100%','display':"block"}
+                    'display': 'none'}, None, None, construct_toast("Missing rows delete",
+                                                                    "Restored {} rows with missing values.".format(
+                                                                        len(df[df['missing-values'] == "true"].index)),
+                                                                    "danger"), \
+                       [{"label": action, "value": action} for action in missing_value_actions], \
+                       {'width': '100%', 'display': "block"}
 
         else:
             place_values = value
@@ -463,8 +417,8 @@ def update_output(content,missing_clicks,apply_click,cancel_click, name,value,da
                    construct_toast("Dataset Info",
                                    "Found {} missing values.\nRows with missing values are highlighted.".format(
                                        len(df[df['missing-values'] == "true"].index)),
-                                   "danger"),[{"label": action, "value": action} for action in missing_value_actions],\
-                   { 'width':'100%','display':"block"}
+                                   "danger"), [{"label": action, "value": action} for action in missing_value_actions], \
+                   {'width': '100%', 'display': "block"}
 
 
     elif content is not None and start == 0:
@@ -472,111 +426,45 @@ def update_output(content,missing_clicks,apply_click,cancel_click, name,value,da
         project.upload_dataset(content, name),
         df = project.dataset.df
         start = 1
-        return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {'display': 'none'}, None, None, None,[],{'display':'none'}
+        return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
+            'display': 'none'}, None, None, None, [], {'display': 'none'}
     else:
         # print("Content is empty")
-        start=0
+        start = 0
         df = pd.DataFrame()
         return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {'display': 'block',
                                                                                    'vertical-align': 'middle',
                                                                                    'width': '100%', 'height': '470px',
                                                                                    'lineHeight': '20px',
-                                                                                   'textAlign': 'center'}, None, None, None,[],{'display':'none'}
+                                                                                   'textAlign': 'center'}, None, None, None, [], {
+                   'display': 'none'}
+
 
 @app.callback(
-    [Output("missing_value", "is_open"),Output("placeholders","options")],
+    [Output("missing_value", "is_open"), Output("placeholders", "options")],
     [Input("missing-value-button", "n_clicks")],
     [State("missing_value", "is_open")],
 )
 def toggle_collapse(n, is_open):
     if n:
-        return not is_open,[{"label": placeholder, "value": placeholder} for placeholder in placeholders]
-    return is_open,[{"label": placeholder, "value": placeholder} for placeholder in placeholders]
+        return not is_open, [{"label": placeholder, "value": placeholder} for placeholder in placeholders]
+    return is_open, [{"label": placeholder, "value": placeholder} for placeholder in placeholders]
 
 
-
-@app.callback(Output('apply_or_cancel','style'),
-              [Input('missing-value-action-dropdown','value')])
+@app.callback(Output('apply_or_cancel', 'style'),
+              [Input('missing-value-action-dropdown', 'value')])
 def show_buttons(value):
     if value is None:
-        return {'display':'none'}
-    elif(value=='Remove Rows With Missing Values'):
-        return {'display':'block'}
-    elif(value=='Fill Missing Values'):
-        return {'display':'none'}
-
-# Callback to set the learning type options
-@app.callback(
-    dash.dependencies.Output("learning_type", "options"),
-    [Input('learning_type', 'value')])
-def update_learning_types(value):
-    return [
-        {"label": learning_type, "value": learning_type} for learning_type in learning_types
-    ]
+        return {'display': 'none'}
+    elif (value == 'Remove Rows With Missing Values'):
+        return {'display': 'block'}
+    elif (value == 'Fill Missing Values'):
+        return {'display': 'none'}
 
 
-# Callback to set the algorithms list based on the value received from the learning type
-@app.callback(
-    dash.dependencies.Output("algorithm_name", "options"),
-    [Input('algorithm_name', 'value'), Input('learning_type', 'value')])
-def update_algorithm_types(algorithm_name, learning_type):
-    if learning_type is None:
-        return []
-    else:
-        return [
-            algorithm for algorithm in algorithms[learning_type]
-        ]
-
-
-# Callback to show the percentage of training and testing data based on the slider movement
-@app.callback(
-    dash.dependencies.Output('split_ratio_value', 'children'),
-    [dash.dependencies.Input('split_ratio', 'value')])
-def update_output(value):
-    return 'Testing : {}% and Training : {}%'.format(value, 100 - value)
-
-
-# Callback to take all columns from the dataset and display it in features dropdown.
-# Also, removes the column which is already selected in target dropdown
-@app.callback(
-    dash.dependencies.Output("feature_column", "options"),
-    [dash.dependencies.Input("feature_column", "search_value"), Input('target_column', 'value'),
-     Input("table1", "columns")],
-)
-def update_options(search_value, value, columns):
-    if value is None:
-        if (len(columns) == 0):
-            return []
-        else:
-            return [{'label': i['name'], 'value': i['name']} for i in columns]
-    else:
-        return [{'label': i['name'], 'value': i['name']} for i in columns if i['name'] != value]
-
-
-# Callback to take all columns from the dataset and display it in target dropdown.
-# Also, removes the columns which are already selected in features dropdown
-@app.callback(
-    dash.dependencies.Output("target_column", "options"),
-    [Input('feature_column', 'value'), Input('target_column', 'value'), Input("table1", "columns")],
-)
-def update_options(value, target_value, columns):
-    target_columns = []
-    if value is None:
-        if (len(columns) == 0):
-            return []
-        else:
-            return [{'label': i['name'], 'value': i['name']} for i in columns]
-
-    for column in columns:
-        if column['name'] not in value:
-            target_columns.append(column)
-
-    return [{'label': i['name'], 'value': i['name']} for i in target_columns]
-
-
-@app.callback(Output('update_dataset_btn','color'),
-              [Input('update_dataset_btn','n_clicks')],
-              [State('table1','data')])
+@app.callback(Output('update_dataset_btn', 'color'),
+              [Input('update_dataset_btn', 'n_clicks')],
+              [State('table1', 'data')])
 def update_dataset(update, content):
     # print(update,content)
     if update is not None and content is not None:
@@ -590,37 +478,17 @@ def update_dataset(update, content):
         raise PreventUpdate
 
 
-@app.callback(Output('linkx','children'),
-              [Input('finish-preprocessing-button','n_clicks')],
-               [State('learning_type','value'),State('algorithm_name','value')
-                ,State('split_ratio','value'),State('feature_column','value'),
-                State('target_column','value')])
-def finish_preprocessing(click,learning_type,algorithm_name,split_ratio,feature_column_names,target_column_name):
+
+@app.callback(Output('linkx', 'children'),
+              [Input('finish-preprocessing-button', 'n_clicks')])
+              # [State('learning_type', 'value'), State('algorithm_name', 'value')
+              #     , State('split_ratio', 'value'), State('feature_column', 'value'),
+              #  State('target_column', 'value')])
+def finish_preprocessing(click):
     if click is not None and click > 0:
-        if None not in [learning_type,algorithm_name,split_ratio,feature_column_names,target_column_name]:
-            if learning_type == 'Supervised':
-                project.create_model(algorithm_name)
-                project.dataset.set_features(feature_column_names)
-                project.dataset.set_target(target_column_name)
-                project.model.set_split_ratio(float(split_ratio/100))
-                return dcc.Location(pathname="/model", id="someid_doesnt_matter")
-            elif learning_type == 'Unsupervised':
-                # TODO: Add support for Unsupervised algos
-                raise PreventUpdate
-        else:
-            raise PreventUpdate
+        return dcc.Location(pathname="/model", id="someid_doesnt_matter")
     else:
         raise PreventUpdate
 
-
-# List of learning types
-learning_types = ['Supervised', 'Unsupervised']
-
-# Dictionary of algorithms
-algorithms = {"Supervised": [
-    {"label": "Random Forest", "value": "RF"},
-    {"label": "SVM", "value": "SVM"}], "Unsupervised": [{"label": "KNN", "value": "1"}]}
-
-
-placeholders = ['','.','?','-1']
-missing_value_actions = ['Remove Rows With Missing Values','Fill Missing Values']
+placeholders = ['', '.', '?', '-1']
+missing_value_actions = ['Remove Rows With Missing Values', 'Fill Missing Values']

@@ -1,10 +1,15 @@
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import dash
 
 from app import app, project
 from apps import homepage, preprocess, eda, model
 
+print(dcc.__version__)
+print(dbc.__version__)
+print(dash.__version__)
 app.layout = html.Div([
     dcc.Location(id='url', refresh=True),
     html.Div(id='page-content')
@@ -28,7 +33,7 @@ def display_page(pathname):
         else:
             return dcc.Location(pathname="/",id='redirect')
     elif pathname == '/model':
-        if hasattr(project,'model'):
+        if hasattr(project,'dataset'):
             return model.layout
         else:
             return dcc.Location(pathname="/",id='redirect')
@@ -37,4 +42,4 @@ def display_page(pathname):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
