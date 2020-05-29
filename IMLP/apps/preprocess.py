@@ -1,4 +1,5 @@
 import dash
+from dash import no_update
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
@@ -11,23 +12,6 @@ import pandas as pd
 from dash.exceptions import PreventUpdate
 
 df = pd.DataFrame()
-
-# few basic styles for tabs component
-tabs_styles = {
-    'height': '60px', 'width': '300px'
-}
-tab_style = {
-    'borderBottom': '1px solid #d6d6d6',
-    'padding': '6px',
-    'fontWeight': 'bold'
-}
-tab_selected_style = {
-    'borderTop': '1px solid #d6d6d6',
-    'borderBottom': '1px solid #d6d6d6',
-    'backgroundColor': '#119DFF',
-    'color': 'white',
-    'padding': '6px'
-}
 
 # Header bar
 navbar = dbc.NavbarSimple(
@@ -60,7 +44,7 @@ upload_dataset = dcc.Upload(
                        html.A('Select Files',
                               style={'font-size': '20px', 'color': 'blue', 'text-decoration': 'underline',
                                      'vertical-align': 'middle', 'align': 'center'})
-                       ], style={'width': '100%', 'vertical-align': 'middle', 'height': '100%', 'align': 'center', }),
+                       ], style={'width': '100%', 'vertical-align': 'middle', 'height': '100%', 'align': 'center'}),
     style={
         'width': '100%',
         'height': '400px',
@@ -73,12 +57,19 @@ update_btn_tooltip = dbc.Tooltip("Clicking this button will update the data and 
                                  target="update_dataset_btn",
                                  ),
 
+update_dataset_button_missing = dbc.Button(
+    "UPDATE DATASET",
+    id="update_dataset_btn_missing", color='danger',
+    className="mb-3", n_clicks=0,
+    outline=True, block=True,
+    style={'width': '100%', 'display': 'none'})
+
 missing_value_collapse = html.Div(
     [
         dbc.Button(
             "Missing Values",
             id="missing-value-button",
-            className="mb-3",
+            className="mb-3", disabled=True,
             color='primary', style={'width': '100%'}
         ),
         dbc.Collapse(
@@ -96,6 +87,9 @@ missing_value_collapse = html.Div(
                              placeholder='Select Action for Missing Values', style=dict(
                         width='100%',
                         verticalAlign="middle")), breakline,
+                dcc.Dropdown(id="missing-value-fill-strategy-dropdown", multi=False,
+                             placeholder='Select a strategy to Impute', style={
+                        'width': '100%', 'display': 'none'}), breakline,
                 html.Div(
                     [
                         dbc.Col(
@@ -107,7 +101,7 @@ missing_value_collapse = html.Div(
                                     className="mb-3", n_clicks=0,
                                     style={'width': '100%'})
                             ],
-                            id='apply_col', style={'width': 'auto'}),
+                            id='apply_col', style={'width': 'auto', 'display': 'none'}),
                         dbc.Col([
                             dbc.Button(
                                 "REVERT",
@@ -115,51 +109,120 @@ missing_value_collapse = html.Div(
                                 className="mb-3", n_clicks=0,
                                 outline=True,
                                 style={'width': '100%'})
-                        ], id='cancel_col', style={'width': 'auto'}),
-                        dbc.Col([
-                            dbc.Button(
-                                "UPDATE DATASET",
-                                id="update_dataset_btn", color='danger',
-                                className="mb-3", n_clicks=0,
-                                outline=True, block=True,
-                                style={'width': '100%'}),
-                        ], id='update_col', style={'width': 'auto'}),
+                        ], id='cancel_col', style={'width': 'auto', 'display': 'none'}),
+                        dbc.Col(update_dataset_button_missing, id='update_missing_col', style={'width': 'auto'}),
                     ],
-                    id='apply_or_cancel', style={'display': 'none'}), breakline,
+                    id='apply_or_cancel', style={'display': 'block'}), breakline,
             ])),
-            id="missing_value",
-        ),
+            id="missing_value_collapse",
+        ), breakline
     ], style={'width': '100%'}
 )
+
+update_dataset_button_columns = dbc.Button(
+    "UPDATE DATASET",
+    id="update_dataset_btn_columns", color='danger',
+    className="mb-3", n_clicks=0,
+    outline=True, block=True,
+    style={'width': '100%', 'display': 'none'})
 
 duplicate_column_collapse = html.Div(
     [
         dbc.Button(
             "Duplicate Columns",
-            id="duplicate-column-button",
-            className="mb-3",
+            id="duplicate-columns-button",
+            className="mb-3", disabled=True,
             color='primary', style={'width': '100%'}
         ),
         dbc.Collapse(
             dbc.Card(dbc.CardBody([breakline,
-                                   dcc.Dropdown(id="duplicate-columns", multi=True, placeholder='Select columns',
-                                                style=dict(
-                                                    width='100%',
-                                                    verticalAlign="middle")), breakline,
                                    dbc.Button(
                                        "Find Duplicate columns",
-                                       id="find-duplicate-columns",
+                                       id="find-duplicate-columns", outline=True,
                                        className="mb-3", n_clicks=0,
                                        color='success', style={'width': '100%'}
                                    ), breakline,
-                                   dcc.Dropdown(id="duplicate-column-action-dropdown", multi=False,
-                                                placeholder='Select Action for Duplicate Columns', style=dict(
-                                           width='100%',
-                                           verticalAlign="middle")), breakline,
+                                   html.Div(
+                                       [
+                                           dbc.Col(
+                                               [
+                                                   dbc.Button(
+                                                       "REMOVE DUPLICATE COLUMNS",
+                                                       id="column_apply_btn", color='success',
+                                                       outline=True,
+                                                       className="mb-3", n_clicks=0,
+                                                       style={'width': '100%'})
+                                               ],
+                                               id='column_apply_col', style={'width': 'auto', 'display': 'none'}),
+                                           html.Div(id='duplicate_column_pos', style={'display': 'none'}),
+                                           dbc.Col([
+                                               dbc.Button(
+                                                   "REVERT",
+                                                   id="column_cancel_btn", color='danger',
+                                                   className="mb-3", n_clicks=0,
+                                                   outline=True,
+                                                   style={'width': '100%'})
+                                           ], id='column_cancel_col', style={'width': 'auto', 'display': 'none'}),
+                                           dbc.Col(update_dataset_button_columns, id='update_column_col',
+                                                   style={'width': 'auto'}),
 
-                                   ])),
-            id="duplicate_columns",
+                                       ],
+                                       id='column_apply_or_cancel', style={'display': 'block'})])),
+            id="duplicate_columns_collapse",
+        ), breakline
+    ], style={'width': '100%'}
+)
+
+update_dataset_button_rows = dbc.Button(
+    "UPDATE DATASET",
+    id="update_dataset_btn_rows", color='danger',
+    className="mb-3", n_clicks=0,
+    outline=True, block=True,
+    style={'width': '100%', 'display': 'none'})
+
+duplicate_rows_collapse = html.Div(
+    [
+        dbc.Button(
+            "Duplicate Rows",
+            id="duplicate-rows-button",
+            className="mb-3", disabled=True,
+            color='primary', style={'width': '100%'}
         ),
+        dbc.Collapse(
+            dbc.Card(dbc.CardBody([breakline,
+                                   dbc.Button(
+                                       "Find Duplicate rows",
+                                       id="find-duplicate-rows",
+                                       className="mb-3", n_clicks=0, outline=True,
+                                       color='success', style={'width': '100%'}
+                                   ), breakline,
+                                   html.Div(
+                                       [
+                                           dbc.Col(
+                                               [
+                                                   dbc.Button(
+                                                       "REMOVE DUPLICATE ROWS",
+                                                       id="row_apply_btn", color='success',
+                                                       outline=True,
+                                                       className="mb-3", n_clicks=0,
+                                                       style={'width': '100%'})
+                                               ],
+                                               id='row_apply_col', style={'width': 'auto', 'display': 'none'}),
+                                           dbc.Col([
+                                               dbc.Button(
+                                                   "REVERT",
+                                                   id="row_cancel_btn", color='danger',
+                                                   className="mb-3", n_clicks=0,
+                                                   outline=True,
+                                                   style={'width': '100%'})
+                                           ], id='row_cancel_col', style={'width': 'auto', 'display': 'none'}),
+                                           dbc.Col(update_dataset_button_rows, id='update_row_col',
+                                                   style={'width': 'auto'}),
+                                       ],
+                                       id='row_apply_or_cancel', style={'display': 'block'}),
+                                   ])),
+            id="duplicate_rows_collapse",
+        ), breakline,
     ], style={'width': '100%'}
 )
 
@@ -170,43 +233,36 @@ finish_preprocessing_button = dbc.Button(
     color='success', style={'width': '100%'}
 ),
 
-# Tabs to do perform various preprocessing steps independently by the user
-process_tabs = dcc.Tabs(id='preprocess_tabs', value='tab-1', children=[
-    dcc.Tab(label='Pre-process functions', value='tab-1', children=
-    [
-    ])
-], style={
-    'height': '80px', 'width': '330px'
-}),
-
 # Datatable to show the dataset to the user
 # TODO: Pagination page number text box width to be increased
-datatable_before_apply = dash_table.DataTable(id='table1', css=[{'selector': '.row', 'rule': 'margin: 0'},
-                                                                {"selector": ".show-hide", "rule": "display: none"}],
-                                              columns=[{"name": i, "id": i} for i in df],
-                                              data=df.to_dict('records'),
-                                              page_size=13,
-                                              page_action="native",
-                                              page_current=0,
-                                              style_table={'overflowX': 'auto', 'display': 'block'})
+dataset_table = dash_table.DataTable(id='table1', css=[{'selector': '.row', 'rule': 'margin: 0'},
+                                                       {"selector": ".show-hide", "rule": "display: none"}],
+                                     columns=[{"name": i, "id": i} for i in df],
+                                     data=df.to_dict('records'),
+                                     page_size=12,
+                                     page_action="native",
+                                     page_current=0,
+                                     style_table={'overflowX': 'auto', 'display': 'block'})
+
 # Cardbody component to compile all preprocessing elements into single component
 preprocess_flow = [
     dbc.CardBody(
         [
             dbc.Row(html.Div("Preprocessing Steps")),
             dbc.Row(dbc.CardBody([
-            dbc.Row(breakline),
-            dbc.Row(missing_value_collapse),
-            dbc.Row(duplicate_column_collapse),
-            dbc.Row(finish_preprocessing_button)
+                dbc.Row(breakline),
+                dbc.Row(missing_value_collapse),
+                dbc.Row(duplicate_column_collapse),
+                dbc.Row(duplicate_rows_collapse),
+                dbc.Row(finish_preprocessing_button)
             ])
-),
+            ),
         ])]
 
 # Cardbody component to compile dataset upload and view into single component
 dataset_input_display = dbc.Card(
     dbc.CardBody(
-        [upload_dataset, datatable_before_apply], style={'height': '57rem'}
+        [upload_dataset, dataset_table], style={'height': '50rem'}
     ), outline=True, color="info"
 )
 
@@ -214,8 +270,7 @@ dataset_input_display = dbc.Card(
 page_footer = html.Div(children=[breakline, breakline, breakline],
                        style={'width': '100%', 'height': '40%', 'background-color': 'black'})
 
-toast_div1 = html.Div(id='toast1')
-toast_div2 = html.Div(id='toast2')
+toast_div = html.Div(id='toast')
 
 finish_warning_modal = dbc.Modal(
     [
@@ -244,7 +299,7 @@ layout = html.Div(
                                 [
                                     dbc.Col(dataset_input_display, width=8),
                                     dbc.Col(dbc.Card(preprocess_flow, outline=True, color="info",
-                                                     style={'padding': '10px 25px 40px', 'height': '57rem',
+                                                     style={'padding': '10px 25px 40px', 'height': '50rem',
                                                             'overflowY': 'scroll'}), width=4, align="center"),
                                 ]
                             )
@@ -253,7 +308,7 @@ layout = html.Div(
                 ),
                 style={'padding': '10px 40px 20px'}
             )
-        ), dbc.Row(toast_div1), dbc.Row(toast_div2), html.Div(id='linkx'),
+        ), dbc.Row(toast_div), html.Div(id='linkx'),
 
     ],
 )
@@ -275,63 +330,76 @@ def construct_toast(header, message, status):
     return toast
 
 
-@app.callback(Output("toast1", "children"),
-              [Input('upload-data', 'filename')], [State('upload-data', 'contents')])
-def show_toast(filename, contents):
-    if filename is None:
-        return None
-    elif hasattr(project, "dataset") and contents is not None:
-        df_info = project.dataset.info()
-        return construct_toast("Dataset Info", "Dataset has been uploaded.\n {}".format(df_info), "info")
-
-
-apply_cancel = 0
-place_values = []
-missing_val_click = 0
-start = 0
-
-
-# this is an important callback which makes the apply and cancel button appear or disappear
-# this callback updates the apply_cancel variable to let the next callback know which button is clicked.
-# this callback is triggered when the dropdown for the missing value action is altered.
-# this style of dropdown for missing values is changed at every button click in the preprocess stage and hence it
-# keeps updating cancel and apply button all the time.
-@app.callback([Output('cancel_col', 'style'), Output('apply_col', 'style')],
-              [Input('missing-value-action-dropdown', 'options')])
-def apply_action(click):
-    global apply_cancel
-    if apply_cancel == 0:
-        # CANCEL
-        # print("Apply value is cancel",start,apply_cancel)
-        apply_cancel = 1
-        return {'display': 'none'}, {'display': 'block'}
-    elif apply_cancel == 1:
-        # APPLY
-        # print("Apply value is apply",start,apply_cancel)
-        apply_cancel = 0
-        return {'display': 'block'}, {'display': 'none'}
-
-
 # callback to take dataset from user and display it in the datatable
 @app.callback([Output("table1", "data"),
                Output("table1", "columns"),
                Output("upload-data", "style"),
                Output("table1", "style_data_conditional"),
                Output("table1", "hidden_columns"),
-               Output("toast2", "children"),
+               Output("toast", "children"),
                Output('missing-value-action-dropdown', 'options'),
-               Output('missing-value-action-dropdown', 'style')],
+               Output('missing-value-action-dropdown', 'style'),
+               Output('cancel_col', 'style'),
+               Output('apply_col', 'style'),
+               Output('missing-value-button', 'disabled'),
+               Output('duplicate-columns-button', 'disabled'),
+               Output('duplicate-rows-button', 'disabled'),
+               Output('column_cancel_col', 'style'),
+               Output('column_apply_col', 'style'),
+               Output('row_cancel_col', 'style'),
+               Output('row_apply_col', 'style'),
+               Output('duplicate_column_pos', 'children'),
+               Output('update_dataset_btn_missing', 'style'),
+               Output('update_dataset_btn_columns', 'style'),
+               Output('update_dataset_btn_rows', 'style'),
+               Output("missing_value_collapse", "is_open"),
+               Output("duplicate_columns_collapse", "is_open"),
+               Output("duplicate_rows_collapse", "is_open"),
+               Output("placeholders", "options"),
+               Output("placeholders", "value"),
+               Output("missing-value-fill-strategy-dropdown", "options"),
+               Output("missing-value-fill-strategy-dropdown", "style"),
+               Output('missing-value-action-dropdown', 'disabled'),
+               Output("missing-value-fill-strategy-dropdown", "disabled")],
               [Input('upload-data', 'contents'),
                Input('check-missing-value-button', 'n_clicks'),
-               Input('apply_btn', 'n_clicks'), Input('cancel_btn', 'n_clicks')],
+               Input('apply_btn', 'n_clicks'),
+               Input('cancel_btn', 'n_clicks'),
+               Input('find-duplicate-columns', 'n_clicks'),
+               Input('find-duplicate-rows', 'n_clicks'),
+               Input('column_cancel_btn', 'n_clicks'),
+               Input('column_apply_btn', 'n_clicks'),
+               Input('row_cancel_btn', 'n_clicks'),
+               Input('row_apply_btn', 'n_clicks'),
+               Input('update_dataset_btn_missing', 'n_clicks'),
+               Input('update_dataset_btn_columns', 'n_clicks'),
+               Input('update_dataset_btn_rows', 'n_clicks'),
+               Input("missing-value-button", "n_clicks"),
+               Input("duplicate-columns-button", "n_clicks"),
+               Input("duplicate-rows-button", "n_clicks"),
+               Input('missing-value-action-dropdown', 'value'),
+               Input("missing-value-fill-strategy-dropdown", "value")],
               [State('upload-data', 'filename'),
-               State('placeholders', 'value'), State("table1", "data")])
-def update_output(content, missing_clicks, apply_click, cancel_click, name, value, datatableData):
-    global place_values
-    global missing_val_click
-    global apply_cancel
-    global start
-
+               State('placeholders', 'value'),
+               State("table1", "data"),
+               State('duplicate_column_pos', 'children'),
+               State("missing_value_collapse", "is_open"),
+               State("duplicate_columns_collapse", "is_open"),
+               State("duplicate_rows_collapse", "is_open")])
+def update_output(content, missing_clicks, apply_click, cancel_click, column_clicks, row_clicks, column_cancel_click,
+                  column_apply_click, row_cancel_click, row_apply_click, update_missing, update_columns, update_rows,
+                  n1, n2, n3, missing_action, strategy, name, value, datatableData, duplicate_col_pos, is_open1,
+                  is_open2, is_open3):
+    component_clicked_id = ""
+    if hasattr(project,'dataset'):
+        missing_values_identifier = project.dataset.identifier + 'missing-values'
+        duplicate_rows_identifier = project.dataset.identifier + 'duplicate-rows'
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        print(len(ctx.outputs_list))
+        raise PreventUpdate
+    else:
+        component_clicked_id = ctx.triggered[0]['prop_id'].split('.')[0]
     if not project:
         df = pd.DataFrame()
         return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {'display': 'block',
@@ -342,153 +410,340 @@ def update_output(content, missing_clicks, apply_click, cancel_click, name, valu
             "ERROR",
             "Please Enter a project name and upload dataset",
             "danger"), None, None, [], {
-                   'display': 'none'}
+                   'display': 'none'}, {'display': 'none'}, {
+                   'display': 'block'}, True, True, True, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
 
-    if value is not None:
-        # if the placeholders change, find missing values
-        if set(place_values) != set(value):
-            place_values = value
-            # print("Missing values button clicked",place_values)
-            missing_val_click = missing_clicks
-            df = project.dataset.df
-            apply_cancel = 0
-            df['missing-values'] = project.dataset.missing_value_indicator(value)
+    if component_clicked_id == "missing-value-button" and n1:
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, not is_open1, False, False, [
+            {"label": placeholder, "value": placeholder} for placeholder in
+            placeholders], no_update, no_update, no_update, no_update, no_update
+    elif component_clicked_id == "duplicate-columns-button" and n2:
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, not is_open2, False, no_update, no_update, no_update, no_update, no_update, no_update
+    elif component_clicked_id == "duplicate-rows-button" and n3:
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, False, not is_open3, no_update, no_update, no_update, no_update, no_update, no_update
+
+    if component_clicked_id == "check-missing-value-button":
+        if value is not None:
+            df = pd.DataFrame(datatableData)
+            if duplicate_rows_identifier in df.columns:
+                df.drop(columns=duplicate_rows_identifier, inplace=True)
+            df[missing_values_identifier] = project.dataset.missing_value_indicator(value)
             style_data_conditional = [{
-                'if': {'filter_query': '{missing-values} eq "true"'},
+                'if': {'filter_query': '{'+ missing_values_identifier +'} eq "true"'},
                 'backgroundColor': '#3D9970',
                 'color': 'white'
             }]
+            if 'true' not in df[missing_values_identifier].to_list():
+                return df.to_dict('records'), \
+                       [{"name": i, "id": i} for i in df.columns], \
+                       {'display': 'none'}, style_data_conditional, [missing_values_identifier], \
+                       construct_toast("Dataset Info",
+                                       "Found 0 missing values.",
+                                       "danger"), \
+                       [{"label": action, "value": action} for action in missing_value_actions], \
+                       {'width': '100%', 'display': "none"}, {'display': 'none'}, {
+                           'display': 'none'}, False, False, False, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
+
             return df.to_dict('records'), \
                    [{"name": i, "id": i} for i in df.columns], \
-                   {'display': 'none'}, style_data_conditional, ['missing-values'], \
+                   {'display': 'none'}, style_data_conditional, [missing_values_identifier], \
                    construct_toast("Dataset Info",
                                    "Found {} missing values.\nRows with missing values are highlighted.".format(
-                                       len(df[df['missing-values'] == "true"].index)),
+                                       len(df[df[missing_values_identifier] == "true"].index)),
                                    "danger"), \
                    [{"label": action, "value": action} for action in missing_value_actions], \
-                   {'width': '100%', 'display': "block"}
+                   {'width': '100%', 'display': "block"}, {'display': 'none'}, {
+                       'display': 'none'}, False, False, False, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
 
-        # if placeholders do not change, check if apply or cancel button is clicked.
-        # start is used to see, if the dataset is uploaded or not.
-        # the count of missing values is checked. If they are equal, missing value button is not clicked.
-        elif missing_val_click == missing_clicks and start == 1:
-            # if apply_cancel =1 , it is always apply button clicked
-            if apply_cancel == 1:
-                # print("Apply button clicked",apply_cancel)
-                df1 = pd.DataFrame(datatableData)
-                df = df1[df1['missing-values'] == "false"].drop(columns='missing-values')
-                return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
-                    'display': 'none'}, None, None, construct_toast("Missing rows delete",
-                                                                    "Deleted {} rows with missing values.".format(
-                                                                        len(df1[df1[
-                                                                                    'missing-values'] == "true"].index)),
-                                                                    "danger"), \
-                       [{"label": action, "value": action} for action in missing_value_actions], \
-                       {'width': '100%', 'display': "block"}
+    if component_clicked_id == "missing-value-fill-strategy-dropdown":
+        return no_update, no_update, no_update, no_update, no_update, no_update, \
+               no_update, no_update, {'display': 'none'}, {'display': 'block'}, no_update, no_update, no_update, \
+               no_update, no_update, no_update, no_update, no_update, {'display': 'none'}, \
+               no_update, no_update, no_update, no_update, no_update, no_update, no_update, \
+               no_update, no_update, no_update, no_update
 
-            # if apply_cancel = 0 , it is always cancel button clicked.
-            elif apply_cancel == 0:
-                # print("Cancel button clicked",apply_cancel)
-                df = pd.DataFrame(project.dataset.df)
-                return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
-                    'display': 'none'}, None, None, construct_toast("Missing rows delete",
-                                                                    "Restored {} rows with missing values.".format(
-                                                                        len(df[df['missing-values'] == "true"].index)),
-                                                                    "danger"), \
-                       [{"label": action, "value": action} for action in missing_value_actions], \
-                       {'width': '100%', 'display': "block"}
+    if component_clicked_id == "missing-value-action-dropdown":
+        if missing_action == missing_value_actions[0]:
+            return no_update, no_update, no_update, no_update, no_update, no_update, \
+                   no_update, no_update, {'display': 'none'}, {'display': 'block'}, no_update, no_update, no_update, \
+                   no_update, no_update, no_update, no_update, no_update, {'display': 'none'}, \
+                   no_update, no_update, no_update, no_update, no_update, no_update, no_update, [], {
+                       'display': 'none'}, no_update, no_update
+
+        elif missing_action == missing_value_actions[1]:
+            return no_update, no_update, no_update, no_update, no_update, no_update, \
+                   no_update, no_update, {'display': 'none'}, {'display': 'none'}, no_update, no_update, no_update, \
+                   no_update, no_update, no_update, no_update, no_update, {'display': 'none'}, \
+                   no_update, no_update, no_update, no_update, no_update, no_update, no_update, \
+                   [{"label": strategyx, "value": strategyx} for strategyx in missing_value_fill_strategy], \
+                   {'display': 'block'}, no_update, no_update
+
+    if component_clicked_id == "apply_btn":
+        if missing_action == missing_value_actions[0]:
+            df1 = pd.DataFrame(datatableData)
+            df1[missing_values_identifier] = project.dataset.missing_value_indicator(value)
+            df = df1[df1[missing_values_identifier] == "false"]
+            return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
+                'display': 'none'}, None, [missing_values_identifier], construct_toast("Missing rows delete",
+                                                                              "Deleted {} rows with missing values.".format(
+                                                                                  len(df1[df1[
+                                                                                              missing_values_identifier] == "true"].index)),
+                                                                              "danger"), \
+                   [{"label": action, "value": action} for action in missing_value_actions], \
+                   {'width': '100%', 'display': "block"}, {'display': 'block'}, {'display': 'none'}, False, True, True, \
+                   no_update, no_update, no_update, no_update, no_update, {
+                       'display': 'block'}, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, True, no_update
+        elif missing_action == missing_value_actions[1]:
+            # functionality based on 'strategy', 'value' here
+
+            df = pd.DataFrame(datatableData)
+            if missing_values_identifier in df.columns:
+                df.drop(columns=missing_values_identifier, inplace=True)
+            df = project.dataset.missing_value_imputer(df, value, strategy)
+            return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
+                'display': 'none'}, None, no_update, construct_toast("Missing rows delete",
+                                                                     "Imputing missing values.",
+                                                                     "danger"), \
+                   no_update, \
+                   {'width': '100%', 'display': "block"}, {'display': 'block'}, {'display': 'none'}, False, True, True, \
+                   no_update, no_update, no_update, no_update, no_update, {
+                       'display': 'block'}, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, True, True
+
+    if component_clicked_id == "cancel_btn":
+        if missing_action == missing_value_actions[0]:
+            df = pd.DataFrame(project.dataset.df.copy())
+            return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
+                'display': 'none'}, None, None, construct_toast("Missing rows delete",
+                                                                "Restored rows with missing values.",
+                                                                "danger"), \
+                   [{"label": action, "value": action} for action in missing_value_actions], \
+                   {'width': '100%', 'display': "block"}, {'display': 'none'}, {
+                       'display': 'block'}, False, False, False, \
+                   no_update, no_update, no_update, no_update, no_update, {
+                       'display': 'none'}, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, no_update
+        elif missing_action == missing_value_actions[1]:
+            df = pd.DataFrame(project.dataset.df.copy())
+            return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
+                'display': 'none'}, None, None, construct_toast("Missing rows delete",
+                                                                "Restored rows with missing values.",
+                                                                "danger"), \
+                   [{"label": action, "value": action} for action in missing_value_actions], \
+                   {'width': '100%', 'display': "block"}, {'display': 'none'}, {
+                       'display': 'block'}, False, False, False, \
+                   no_update, no_update, no_update, no_update, no_update, {
+                       'display': 'none'}, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, False
+
+    if component_clicked_id == "update_dataset_btn_missing":
+        if missing_action == missing_value_actions[0]:
+            df = pd.DataFrame(datatableData)
+            if missing_values_identifier in df.columns:
+                df.drop(columns=missing_values_identifier, inplace=True)
+            if duplicate_rows_identifier in df.columns:
+                df.drop(columns=duplicate_rows_identifier, inplace=True)
+            project.dataset.df = df.copy()
+            return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
+                'display': 'none'}, None, None, construct_toast("Missing rows delete",
+                                                                "DATASET UPDATED. Removed all the rows with missing values.",
+                                                                "danger"), \
+                   [{"label": action, "value": action} for action in missing_value_actions], \
+                   {'width': '100%', 'display': "none"}, {'display': 'none'}, {'display': 'none'}, False, False, False, \
+                   no_update, no_update, no_update, no_update, no_update, {
+                       'display': 'none'}, no_update, no_update, not is_open1, not is_open2, no_update, no_update, no_update, no_update, {
+                       'display': 'none'}, False, no_update
+        elif missing_action == missing_value_actions[1]:
+            df = pd.DataFrame(datatableData)
+            if missing_values_identifier in df.columns:
+                df.drop(columns=missing_values_identifier, inplace=True)
+            if duplicate_rows_identifier in df.columns:
+                df.drop(columns=duplicate_rows_identifier, inplace=True)
+            project.dataset.df = df.copy()
+            return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
+                'display': 'none'}, None, None, construct_toast("Missing rows delete",
+                                                                "DATASET UPDATED. Removed all the rows with missing values.",
+                                                                "danger"), \
+                   [{"label": action, "value": action} for action in missing_value_actions], \
+                   {'width': '100%', 'display': "none"}, {'display': 'none'}, {'display': 'none'}, False, False, False, \
+                   no_update, no_update, no_update, no_update, no_update, {
+                       'display': 'none'}, no_update, no_update, not is_open1, not is_open2, no_update, no_update, no_update, no_update, {
+                       'display': 'none'}, False, False
+
+    if component_clicked_id == "find-duplicate-columns":
+        # perform operations to determine duplicate columns and highlight them in the table
+        df = pd.DataFrame(datatableData)
+        if missing_values_identifier in df.columns:
+            df.drop(columns=missing_values_identifier, inplace=True)
+        if duplicate_rows_identifier in df.columns:
+            df.drop(columns=duplicate_rows_identifier, inplace=True)
+
+        statusx, positions = project.dataset.duplicate_column_check(df)
+        if statusx:
+            style_data_conditional = [{'if': {'column_id': df.columns[i]}, 'backgroundColor': 'pink'} for i in
+                                      positions]
+            toast = construct_toast("Duplicate Column info",
+                                    "Found {} Duplicate Columns.".format(len(positions)),
+                                    "danger")
+            cancel_col_style = {'display': 'none'}
+            apply_col_style = {'display': 'block'}
 
         else:
-            place_values = value
-            # print("Missing values button clicked",place_values)
-            missing_val_click = missing_clicks
+            style_data_conditional = None
+            toast = construct_toast("Duplicate Column Info",
+                                    "No Duplicate Columns found.",
+                                    "info")
+            cancel_col_style = {'display': 'none'}
+            apply_col_style = {'display': 'none'}
 
-            df = project.dataset.df
-            apply_cancel = 0
-            df['missing-values'] = project.dataset.missing_value_indicator(value)
-            style_data_conditional = [{
-                'if': {'filter_query': '{missing-values} eq "true"'},
-                'backgroundColor': '#3D9970',
-                'color': 'white'
-            }]
-            return df.to_dict('records'), \
-                   [{"name": i, "id": i} for i in df.columns], \
-                   {'display': 'none'}, style_data_conditional, ['missing-values'], \
-                   construct_toast("Dataset Info",
-                                   "Found {} missing values.\nRows with missing values are highlighted.".format(
-                                       len(df[df['missing-values'] == "true"].index)),
-                                   "danger"), [{"label": action, "value": action} for action in missing_value_actions], \
-                   {'width': '100%', 'display': "block"}
+        return no_update, no_update, no_update, style_data_conditional, no_update, toast, no_update, no_update, no_update, \
+               no_update, no_update, no_update, no_update, cancel_col_style, apply_col_style, no_update, no_update, \
+               positions, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
 
+    if component_clicked_id == "column_apply_btn":
+        df = pd.DataFrame(datatableData)
+        df.drop(df.columns[duplicate_col_pos], axis=1, inplace=True)
+        toast = construct_toast("Duplicate Column Info",
+                                "Removed duplicate columns.",
+                                "danger")
+        # update header
+        return df.to_dict('record'), \
+               [{"name": i, "id": i} for i in df.columns], \
+               no_update, no_update, no_update, toast, no_update, no_update, no_update, no_update, True, False, True, {
+                   'display': 'block'}, {'display': 'none'}, no_update, no_update, no_update, no_update, {
+                   'display': 'block'}, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
 
-    elif content is not None and start == 0:
-        # print("Content is not empty")
-        project.upload_dataset(content, name),
-        df = project.dataset.df
-        start = 1
+    if component_clicked_id == "column_cancel_btn":
+        df = project.dataset.df.copy()
+        toast = construct_toast("Duplicate Column Info",
+                                "Restored the duplicate columns.",
+                                "danger")
+        return df.to_dict('record'), \
+               [{"name": i, "id": i} for i in df.columns], \
+               no_update, no_update, no_update, toast, no_update, no_update, no_update, no_update, False, False, False, {
+                   'display': 'none'}, {'display': 'block'}, no_update, no_update, no_update, no_update, {
+                   'display': 'none'}, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
+
+    if component_clicked_id == "update_dataset_btn_columns":
+        df = pd.DataFrame(datatableData)
+        project.dataset.df = df.copy()
+        project.dataset.header = pd.Series(df.columns)
         return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
-            'display': 'none'}, None, None, None, [], {'display': 'none'}
+            'display': 'none'}, None, None, construct_toast("Duplicate column delete",
+                                                            "DATASET UPDATED. Removed all the duplicate columns.",
+                                                            "danger"), \
+               [{"label": action, "value": action} for action in missing_value_actions], \
+               {'width': '100%', 'display': "none"}, {'display': 'none'}, {'display': 'none'}, False, False, False, \
+               {'display': 'none'}, {'display': 'none'}, no_update, no_update, no_update, \
+               {'display': 'none'}, {
+                   'display': 'none'}, no_update, no_update, not is_open2, not is_open3, no_update, no_update, no_update, no_update, no_update, no_update
+
+    if component_clicked_id == "find-duplicate-rows":
+        # perform operations to determine duplicate rows and highlight them in the table
+        df = pd.DataFrame(datatableData)
+        if missing_values_identifier in df.columns:
+            df.drop(columns=missing_values_identifier, inplace=True)
+        if duplicate_rows_identifier in df.columns:
+            df.drop(columns=duplicate_rows_identifier, inplace=True)
+        df[duplicate_rows_identifier] = project.dataset.duplicate_rows_check(df)
+        style_data_conditional = [{
+            'if': {'filter_query': '{' + duplicate_rows_identifier + '} eq "True"'},
+            'backgroundColor': '#3D9970',
+            'color': 'white'
+        }]
+        if 'True' not in df[duplicate_rows_identifier].to_list():
+            Toast = construct_toast("Duplicate rows info",
+                                    "No Duplicate Rows Found.",
+                                    "info")
+            return df.to_dict('record'), \
+                   [{"name": i, "id": i} for i in df.columns], \
+                   no_update, style_data_conditional, [
+                       duplicate_rows_identifier], Toast, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, {
+                       'display': 'none'}, {
+                       'display': 'none'}, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
+
+        else:
+            Toast = construct_toast("Duplicate rows Found",
+                                    "Duplicate Rows are highlighted.",
+                                    "danger")
+
+            return df.to_dict('record'), \
+                   [{"name": i, "id": i} for i in df.columns], \
+                   no_update, style_data_conditional, [
+                       duplicate_rows_identifier], Toast, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, {
+                       'display': 'none'}, {
+                       'display': 'block'}, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
+
+    if component_clicked_id == "row_apply_btn":
+        df = pd.DataFrame(datatableData)
+        df[duplicate_rows_identifier] = project.dataset.duplicate_rows_check(df)
+        df = df.drop(columns=duplicate_rows_identifier).drop_duplicates()
+        return df.to_dict('record'), \
+               [{"name": i, "id": i} for i in df.columns], \
+               no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, True, True, False, no_update, no_update, {
+                   'display': 'block'}, {'display': 'none'}, no_update, no_update, no_update, {
+                   'display': 'block'}, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
+
+    if component_clicked_id == "row_cancel_btn":
+        df = project.dataset.df.copy()
+        return df.to_dict('record'), \
+               [{"name": i, "id": i} for i in df.columns], \
+               no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, False, False, no_update, no_update, {
+                   'display': 'none'}, {'display': 'block'}, no_update, no_update, no_update, {
+                   'display': 'none'}, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
+
+    if component_clicked_id == "update_dataset_btn_rows":
+        df = pd.DataFrame(datatableData)
+        if missing_values_identifier in df.columns:
+            df.drop(columns=missing_values_identifier, inplace=True)
+        if duplicate_rows_identifier in df.columns:
+            df.drop(columns=duplicate_rows_identifier, inplace=True)
+        project.dataset.df = df.copy()
+        return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
+            'display': 'none'}, None, None, construct_toast("Duplicate rows delete",
+                                                            "DATASET UPDATED. Removed all the duplicate rows.",
+                                                            "danger"), \
+               [{"label": action, "value": action} for action in missing_value_actions], \
+               {'width': '100%', 'display': "none"}, {'display': 'none'}, {'display': 'none'}, False, False, False, \
+               no_update, no_update, {'display': 'none'}, {'display': 'none'}, no_update, {
+                   'display': 'none'}, no_update, {
+                   'display': 'none'}, no_update, no_update, not is_open3, no_update, no_update, no_update, no_update, no_update, no_update
+
+    if component_clicked_id == "upload-data":
+        project.upload_dataset(content, name),
+        df = project.dataset.df.copy()
+        df_info = project.dataset.info()
+        return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
+            'display': 'none'}, None, None, construct_toast("Dataset Info",
+                                                            "Dataset has been uploaded.\n {}".format(df_info),
+                                                            "info"), [], {'display': 'none'}, {'display': 'none'}, {
+                   'display': 'none'}, False, False, False, {'display': 'none'}, {'display': 'none'}, {
+                   'display': 'none'}, {'display': 'none'}, no_update, {'display': 'none'}, {'display': 'none'}, {
+                   'display': 'none'}, False, False, False, no_update, [], no_update, no_update, no_update, no_update
     else:
-        # print("Content is empty")
-        start = 0
         df = pd.DataFrame()
+        if hasattr(project, 'dataset'):
+            df = project.dataset.df.copy()
+            return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
+                'display': 'none'}, None, None, None, [], {'display': 'none'}, {'display': 'none'}, {
+                       'display': 'block'}, False, False, False, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, False, False, no_update, [], no_update, no_update, no_update, no_update
+
         return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {'display': 'block',
                                                                                    'vertical-align': 'middle',
                                                                                    'width': '100%', 'height': '470px',
                                                                                    'lineHeight': '20px',
                                                                                    'textAlign': 'center'}, None, None, None, [], {
-                   'display': 'none'}
-
-
-@app.callback(
-    [Output("missing_value", "is_open"), Output("placeholders", "options")],
-    [Input("missing-value-button", "n_clicks")],
-    [State("missing_value", "is_open")],
-)
-def toggle_collapse(n, is_open):
-    if n:
-        return not is_open, [{"label": placeholder, "value": placeholder} for placeholder in placeholders]
-    return is_open, [{"label": placeholder, "value": placeholder} for placeholder in placeholders]
-
-
-@app.callback(Output('apply_or_cancel', 'style'),
-              [Input('missing-value-action-dropdown', 'value')])
-def show_buttons(value):
-    if value is None:
-        return {'display': 'none'}
-    elif (value == 'Remove Rows With Missing Values'):
-        return {'display': 'block'}
-    elif (value == 'Fill Missing Values'):
-        return {'display': 'none'}
-
-
-@app.callback(Output('update_dataset_btn', 'color'),
-              [Input('update_dataset_btn', 'n_clicks')],
-              [State('table1', 'data')])
-def update_dataset(update, content):
-    # print(update,content)
-    if update is not None and content is not None:
-        if update > 0:
-            project.dataset.df = pd.DataFrame(content)
-            # print(project.dataset.df)
-            return 'success'
-        else:
-            raise PreventUpdate
-    else:
-        raise PreventUpdate
-
+                   'display': 'none'}, {'display': 'none'}, {
+                   'display': 'block'}, True, True, True, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, False, False, no_update, [], no_update, no_update, no_update, no_update
 
 
 @app.callback(Output('linkx', 'children'),
               [Input('finish-preprocessing-button', 'n_clicks')])
-              # [State('learning_type', 'value'), State('algorithm_name', 'value')
-              #     , State('split_ratio', 'value'), State('feature_column', 'value'),
-              #  State('target_column', 'value')])
 def finish_preprocessing(click):
     if click is not None and click > 0:
         return dcc.Location(pathname="/model", id="someid_doesnt_matter")
     else:
         raise PreventUpdate
 
+
 placeholders = ['', '.', '?', '-1']
 missing_value_actions = ['Remove Rows With Missing Values', 'Fill Missing Values']
+missing_value_fill_strategy = ['mean', 'median', 'most_frequent', 'constant']
+duplicate_column_options = ['Find based on Column names', 'Find based on Column values']
