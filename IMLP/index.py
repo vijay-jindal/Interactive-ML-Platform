@@ -7,6 +7,9 @@ import dash
 from app import app, project
 from apps import homepage, preprocess, eda, model
 
+from dash import no_update
+from dash.exceptions import PreventUpdate
+
 print(dcc.__version__)
 print(dbc.__version__)
 print(dash.__version__)
@@ -37,6 +40,8 @@ def display_page(pathname):
             return model.layout
         else:
             return dcc.Location(pathname="/",id='redirect')
+    elif pathname is not None and "/downloads/" in pathname:
+        raise PreventUpdate
     else:
         return dcc.Location(pathname="/", id='redirect')
 

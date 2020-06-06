@@ -175,9 +175,11 @@ model_page_contents = html.Div(children=[
             dbc.Row(breakline),
             dbc.Row(confirm_algorithm_btn)
         ], id='algorithm_select_display', style={'display': 'block'}),
-    dbc.CardBody([display_contents], id='hyperparameter_select_display', style={'display': 'none'})
+    dbc.CardBody([display_contents], id='hyperparameter_select_display', style={'display': 'none'}),
+    dbc.CardBody(dbc.Row([dbc.Col(dbc.Button("Save Model",id="save_model_btn",n_clicks = 0)),dbc.Col(dcc.Link(dbc.Button("Download Model",n_clicks = 0,disabled=True,id="download_model_btn"), id='download_link', href='', refresh=True))])
+    , id='save_download_model',style={'display': 'none'})
 ], style={
-    'height': '80px', 'width': '330px'}),
+    'height': '80px', 'width': '330px'})
 
 # component to compile all the elements into single element
 layout = html.Div(
@@ -206,7 +208,6 @@ layout = html.Div(
                 style={'padding': '10px 40px 20px'}
             )
         ),
-
     ],
 )
 
@@ -238,7 +239,8 @@ confirm_click = 0
                Output('target_column_info', 'children'),
                Output('hyperparameters_div', 'children'),
                Output('hyperparameter_select_display', 'style'),
-               Output('algorithm_select_display', 'style')],
+               Output('algorithm_select_display', 'style'),
+               Output('save_download_model', 'style')],
               [Input('confirm-details-button', 'n_clicks'), Input('edit', 'n_clicks')],
               [State('learning_type', 'value'), State('algorithm_name', 'value')
                   , State('split_ratio', 'value'), State('feature_column', 'value'),
@@ -258,14 +260,14 @@ def fill_model_details(confirm_clickx, edit_clickx, learning_type, algorithm_nam
                 project.model.set_split_ratio(float(split_ratio / 100))
                 hyperparamters_components = create_hyperparameter_fields()
                 algo, split, f_col, t_col = display_algorithm_info()
-                return algo, split, f_col, t_col, hyperparamters_components, {'display': 'block'}, {'display': 'none'}
+                return algo, split, f_col, t_col, hyperparamters_components, {'display': 'block'}, {'display': 'none'}, {'display': 'block'}
             elif learning_type == 'Unsupervised':
                 # TODO: Add support for Unsupervised algos
                 raise PreventUpdate
         else:
             raise PreventUpdate
     else:
-        return [], [], [], [], None, {'display': 'none'}, {'display': 'block'}
+        return [], [], [], [], None, {'display': 'none'}, {'display': 'block'}, {'display': 'none'}
 
 
 def display_algorithm_info():
@@ -431,6 +433,17 @@ def update_options(value, target_value):
             target_columns.append(column)
 
     return [{'label': i, 'value': i} for i in target_columns]
+
+@app.callback(
+    [Output('download_link','href'), Output('download_model_btn','disabled')],
+    [Input('save_model_btn','n_clicks')]
+)
+def save_model(n_clicks):
+    if n_clicks > 0 and hasattr(project,'model'):
+        project.save_model()
+        return "/downloads/{}".format("model-" + project.date_created.strftime("%Y%m%d%H%M%S") + ".sav"),False
+    else:
+        raise PreventUpdate
 
 # List of learning types
 learning_types = ['Supervised', 'Unsupervised']

@@ -13,6 +13,8 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 import logging
 from services.project import Project
+import flask
+from flask import redirect
 # Setting styles and css
 # TODO : use assets folder to load css
 FONT_AWESOME = "https://use.fontawesome.com/releases/v5.10.2/css/all.css"
@@ -35,7 +37,14 @@ app.config.suppress_callback_exceptions = True
 
 project = Project(app)
 
-
+@server.route('/downloads/<path>')
+def serve_static(path):
+    if hasattr(project,'path'):
+        return flask.send_from_directory(
+            project.path, path, cache_timeout = 0
+        )
+    else:
+        return redirect("/")
 # app.layout = html.Div([
 #     dcc.Location(id='url', refresh=False),
 #     html.Div(id='page-content')

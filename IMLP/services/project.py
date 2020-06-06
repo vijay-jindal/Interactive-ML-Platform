@@ -3,6 +3,7 @@ from datetime import datetime
 import os,tempfile
 from services.dataset import Dataset
 from services.model import Model
+import pickle
 
 class Project:
     """docstring for Project."""
@@ -24,6 +25,9 @@ class Project:
 
     def create_model(self, name):
         self.model = Model(self.app, self.dataset, Model.Classifiers[name])
+
+    def save_model(self):
+        pickle.dump(self.model.classifier, open(os.path.join(self.path,"model-" + self.date_created.strftime("%Y%m%d%H%M%S") + ".sav"), 'wb'))
 
     @staticmethod
     def save_file(path, content):
