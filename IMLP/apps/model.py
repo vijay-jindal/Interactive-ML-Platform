@@ -73,18 +73,55 @@ display_contents = html.Div(children=[hyperparameter_header, html.Br(), hyperpar
 page_footer = html.Div(children=[breakline, breakline, breakline],
                        style={'width': '100%', 'height': '40%', 'background-color': 'black'})
 
+learning_type_tooltip = html.Div(
+    [
+        html.A(href='https://scikit-learn.org/stable/user_guide.html',target="_blank",className="fas fa-question-circle fa-lg", id="learning_type_tooltip"),
+        dbc.Tooltip("There are two types of learning. Supervised learning requires labelled dataset whereas "
+                    "Unsupervised learning uses unlabelled dataset and performs clustering.",
+                    target="learning_type_tooltip"),
+    ])
+
+algorithm_name_tooltip = html.Div(
+    [
+        html.A(href='https://scikit-learn.org/stable/user_guide.html',target="_blank",className="fas fa-question-circle fa-lg", id="algorithm_name_tooltip"),
+        dbc.Tooltip("Various algorithms work differently and give different accuracy. Try them and find out which one "
+                    "suits your requirement.", target="algorithm_name_tooltip"),
+    ])
+
+feature_columns_tooltip = html.Div(
+    [
+        html.A(href='https://scikit-learn.org/stable/glossary.html',target="_blank",className="fas fa-question-circle fa-lg", id="feature_columns_tooltip"),
+        dbc.Tooltip("Select all the columns that you want the Algorithm to use for training", target="feature_columns_tooltip"),
+    ])
+
+target_column_tooltip = html.Div(
+    [
+        html.A(href='https://scikit-learn.org/stable/glossary.html',target="_blank",className="fas fa-question-circle fa-lg", id="target_column_tooltip"),
+        dbc.Tooltip("Select the column name that you want to the model to predict after training.", target="target_column_tooltip"),
+    ])
+
+split_ratio_tooltip = html.Div(
+    [
+        html.A(href='https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html',target="_blank",className="fas fa-question-circle fa-lg", id="split_ratio_tooltip"),
+        dbc.Tooltip("This is the ratio in which the dataset will be divided into training and testing data.", target="split_ratio_tooltip"),
+    ])
+
 # dropdown to take input of learning type
 learning_type_dropdown = dcc.Dropdown(id='learning_type', searchable=False, placeholder="Select the Learning type",
                                       style=dict(
                                           width='100%',
-                                          verticalAlign="middle"
                                       ))
 # dropdown to take input of algorithm name
-algorithm_type_dropdown = dcc.Dropdown(id='algorithm_name', searchable=False, placeholder="Select the Algorithm",
+algorithm_type_dropdown = html.Div(dcc.Dropdown(id='algorithm_name', searchable=False, placeholder="Select the Algorithm",
                                        style=dict(
                                            width='100%',
                                            verticalAlign="middle"
-                                       ))
+                                       )),
+                                   id='algorithm-type-div',
+                                   style=dict(
+                                       width='100%',
+                                       verticalAlign="middle"
+                                   ))
 # Label to tell user to select split ratio
 split_ratio_label = html.Label('Select the Split Ratio',
                                style=dict(
@@ -93,7 +130,7 @@ split_ratio_label = html.Label('Select the Split Ratio',
                                ))
 # Slider to select the percentage of test sata
 split_ratio_slider = html.Div(dcc.Slider(id='split_ratio', min=0, max=100, step=5, value=20),
-                              style={'height': '10px', 'width': '100%'}),
+                              style={'height': '10px', 'width': '100%'},id='split-ratio-div'),
 # Div to show the train and test percentage
 split_ratio_value = html.Div(id='split_ratio_value', style=dict(
     width='100%',
@@ -123,18 +160,18 @@ model_page_contents = html.Div(children=[
     dbc.CardBody(
         [
             dbc.Row(breakline),
-            dbc.Row(learning_type_dropdown),
+            dbc.Row([dbc.Col(learning_type_dropdown, width=10),dbc.Col(learning_type_tooltip, width=2)]),
             dbc.Row(breakline),
-            dbc.Row(algorithm_type_dropdown),
+            dbc.Row([dbc.Col(algorithm_type_dropdown, width=10), dbc.Col(algorithm_name_tooltip, width=2)]),
             dbc.Row(breakline),
-            dbc.Row(features_dropdown),
+            dbc.Row([dbc.Col(features_dropdown, width=10), dbc.Col(feature_columns_tooltip, width=2)]),
             dbc.Row(breakline),
-            dbc.Row(target_dropdown),
+            dbc.Row([dbc.Col(target_dropdown, width=10), dbc.Col(target_column_tooltip, width=2)]),
             dbc.Row(breakline),
-            dbc.Row(split_ratio_label),
-            dbc.Row(split_ratio_slider),
+            dbc.Row([dbc.Col(split_ratio_label, width=10)]),
+            dbc.Row([dbc.Col(split_ratio_slider, width=10), dbc.Col(split_ratio_tooltip, width=2)]),
             dbc.Row(breakline),
-            dbc.Row(split_ratio_value),
+            dbc.Row([dbc.Col(split_ratio_value, width=10)]),
             dbc.Row(breakline),
             dbc.Row(confirm_algorithm_btn)
         ], id='algorithm_select_display', style={'display': 'block'}),
@@ -271,10 +308,11 @@ def create_hyperparameter_fields():
         hyperparameter_list = project.model.get_params()
         for k, v in hyperparameter_list.items():
             target_id = "{}_tooltip".format(k)
-            tooltip_message = "Infomation about the hyperparameter here."
+            tooltip_message = "{}".format(v['tooltip_message'])
             tooltip = html.Div(
                 [
-                    html.I(className="fas fa-question-circle fa-lg", id=target_id),
+                    html.A(href=v['link'], target="_blank",
+                           className="fas fa-question-circle fa-lg", id=target_id),
                     dbc.Tooltip(tooltip_message, target=target_id),
                 ],
             )
@@ -394,17 +432,20 @@ def update_options(value, target_value):
 
     return [{'label': i, 'value': i} for i in target_columns]
 
-
 # List of learning types
 learning_types = ['Supervised', 'Unsupervised']
 
 # Dictionary of algorithms
 algorithms = {"Supervised":
     [
-        {"label": "Random Forest", "value": "RF"},
-        {"label": "SVM", "value": "SVM"}
+        {"label": "Random Forest Classifier", "value": "RF"},
+        {"label": "SVM Classifier", "value": "SVM"},
+        {"label": "Decision Tree classifier", "value": "DT"},
+        {"label": "Naive Bayes classifier", "value": "NB"}
     ],
     "Unsupervised":
         [
-            {"label": "KNN", "value": "1"}
+            {"label": "KNN", "value": "1"},
+            {"label": "K-means", "value": "2"},
+            {"label": "Mean Shift", "value": "3"},
         ]}

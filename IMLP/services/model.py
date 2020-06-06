@@ -17,12 +17,16 @@ class Model(object):
                 'n_estimators':
                     {
                         'default': 100,
-                        'param_values': {'int': ['+']}
+                        'param_values': {'int': ['+']},
+                        'tooltip_message':'The number of trees in the forest',
+                        'link':'https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html'
                     },
                 'max_features':
                     {
                         'default': 'auto',
-                        'param_values': {'int': ['+'], 'float': ['+'], 'string': ['auto', 'sqrt', 'log2'], None: []}
+                        'param_values': {'int': ['+'], 'float': ['+'], 'string': ['auto', 'sqrt', 'log2'], None: []},
+                        'tooltip_message': 'The number of features to consider when looking for the best split',
+                        'link':'https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html'
                     }
             },
         'SVC':
@@ -30,21 +34,26 @@ class Model(object):
                 'kernel':
                     {
                         'default': 'rbf',
-                        'param_values': {'string': ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed']}
+                        'param_values': {'string': ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed']},
+                        'tooltip_message': 'SVM algorithms use a set of mathematical functions that are defined as the kernel. The function of kernel is to take data as input and transform it into the required form.',
+                        'link':'https://scikit-learn.org/stable/modules/classes.html#module-sklearn.svm'
                     },
                 'C':
                     {
                         'default': 1.0,
-                        'param_values': {'float': ['+']}
+                        'param_values': {'float': ['+']},
+                        'tooltip_message': 'C is a regularization parameter that controls the trade off between the achieving a low training error and a low testing error that is the ability to generalize your classifier to unseen data.',
+                        'link':'https://scikit-learn.org/stable/modules/classes.html#module-sklearn.svm'
                     },
                 'gamma':
                     {
                         'default': 'scale',
                         'param_values': {'string': ['scale', 'auto'],
-                                         'float': ['+']}
+                                         'float': ['+']},
+                        'tooltip_message': ' The gamma parameter defines how far the influence of a single training example reaches, with low values meaning far and high values meaning close.',
+                        'link':'https://scikit-learn.org/stable/modules/classes.html#module-sklearn.svm'
                     }
             }
-
     }
 
     def __init__(self, app, dataset, name):
