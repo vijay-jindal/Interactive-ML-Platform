@@ -23,11 +23,21 @@ class Project:
         self.app.logger.info("Uploaded Dataset to "+ dpath)
         self.dataset = Dataset(self.app,dpath)
 
-    def create_model(self, name):
-        self.model = Model(self.app, self.dataset, Model.Classifiers[name])
+    def create_model(self, type, name):
+        if type == "Supervised":
+            self.model = Model(self.app, self.dataset, type, Model.Classifiers[name])
+        elif type == "Unsupervised":
+            self.model = Model(self.app, self.dataset, type, Model.Clusterers[name])
+        else:
+            self.app.logger.info("Learning type is not valid")
 
     def save_model(self):
-        pickle.dump(self.model.classifier, open(os.path.join(self.path,"model-" + self.date_created.strftime("%Y%m%d%H%M%S") + ".sav"), 'wb'))
+        if self.model.learning_type == "Supervised":
+            pickle.dump(self.model.classifier, open(os.path.join(self.path,"model-" + self.date_created.strftime("%Y%m%d%H%M%S") + ".sav"), 'wb'))
+        elif self.model.learning_type == "Unsupervised":
+            pickle.dump(self.model.clusterer, open(os.path.join(self.path,"model-" + self.date_created.strftime("%Y%m%d%H%M%S") + ".sav"), 'wb'))
+        else:
+            self.app.logger.info("Learning type is not valid")
 
     @staticmethod
     def save_file(path, content):

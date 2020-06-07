@@ -7,12 +7,8 @@ import dash
 from app import app, project
 from apps import homepage, preprocess, eda, model
 
-from dash import no_update
 from dash.exceptions import PreventUpdate
 
-print(dcc.__version__)
-print(dbc.__version__)
-print(dash.__version__)
 app.layout = html.Div([
     dcc.Location(id='url', refresh=True),
     html.Div(id='page-content')
@@ -21,7 +17,6 @@ app.layout = html.Div([
 
 @app.callback(Output('page-content', 'children'),
               [Input('url', 'pathname')])
-# TODO: check for project instance if it exists at each endpoint using getattr or hasattr
 def display_page(pathname):
     if pathname == '/':
         return homepage.layout

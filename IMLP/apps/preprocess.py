@@ -298,7 +298,7 @@ finish_preprocessing_button = dbc.Button(
 # Datatable to show the dataset to the user
 dataset_table = dash_table.DataTable(id='table1', css=[{'selector': '.row', 'rule': 'margin: 0'},
                                                        {"selector": ".show-hide", "rule": "display: none"},
-                                                       {"selector": "input.current-page", "rule": "width: 30%"}],
+                                                       {"selector": "input.current-page", "rule": "width: 50px"}],
                                      columns=[{"name": i, "id": i} for i in df],
                                      data=df.to_dict('records'),
                                      page_size=12,

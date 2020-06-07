@@ -6,6 +6,9 @@ import dash_table
 from app import app, project
 import traceback
 from dash.exceptions import PreventUpdate
+from dash import no_update
+
+#from numpy import unique, where
 
 # Header bar
 navbar = dbc.NavbarSimple(
@@ -240,7 +243,8 @@ confirm_click = 0
                Output('hyperparameters_div', 'children'),
                Output('hyperparameter_select_display', 'style'),
                Output('algorithm_select_display', 'style'),
-               Output('save_download_model', 'style')],
+               Output('save_download_model', 'style'),
+               Output('start_training', 'children')],
               [Input('confirm-details-button', 'n_clicks'), Input('edit', 'n_clicks')],
               [State('learning_type', 'value'), State('algorithm_name', 'value')
                   , State('split_ratio', 'value'), State('feature_column', 'value'),
@@ -252,57 +256,80 @@ def fill_model_details(confirm_clickx, edit_clickx, learning_type, algorithm_nam
 
     if confirm_click != confirm_clickx:
         confirm_click = confirm_clickx
-        if None not in [learning_type, algorithm_name, split_ratio, feature_column_names, target_column_name]:
+        if (None and '') not in [learning_type, algorithm_name, split_ratio, feature_column_names, target_column_name]:
             if learning_type == 'Supervised':
-                project.create_model(algorithm_name)
+                project.create_model(learning_type,algorithm_name)
                 project.dataset.set_features(feature_column_names)
                 project.dataset.set_target(target_column_name)
                 project.model.set_split_ratio(float(split_ratio / 100))
                 hyperparamters_components = create_hyperparameter_fields()
                 algo, split, f_col, t_col = display_algorithm_info()
-                return algo, split, f_col, t_col, hyperparamters_components, {'display': 'block'}, {'display': 'none'}, {'display': 'block'}
-            elif learning_type == 'Unsupervised':
-                # TODO: Add support for Unsupervised algos
-                raise PreventUpdate
+                return algo, split, f_col, t_col, hyperparamters_components, {'display': 'block'}, {'display': 'none'}, {'display': 'block'}, "START TRAINING"
+        elif (None and '') not in [learning_type, algorithm_name,feature_column_names]:
+            if learning_type == 'Unsupervised':
+                project.create_model(learning_type,algorithm_name)
+                project.dataset.set_features(feature_column_names)
+                hyperparamters_components = create_hyperparameter_fields()
+                algo, f_col = display_algorithm_info()
+                return algo, None, f_col, None, hyperparamters_components, {'display': 'block'}, {'display': 'none'}, {'display': 'block'}, "START CLUSTERING"
         else:
             raise PreventUpdate
     else:
-        return [], [], [], [], None, {'display': 'none'}, {'display': 'block'}, {'display': 'none'}
+        return [], [], [], [], None, {'display': 'none'}, {'display': 'block'}, {'display': 'none'}, no_update
 
 
 def display_algorithm_info():
     if hasattr(project, 'model'):
-        a_name = project.model.classifier_name
-        s_ratio = project.model.test_size
-        f_columns = project.dataset.X
-        t_column = project.dataset.y
+        if project.model.learning_type == "Supervised":
+            a_name = project.model.classifier_name
+            s_ratio = project.model.test_size
+            f_columns = project.dataset.X
+            t_column = project.dataset.y
 
-        algo = dbc.Row([
+            algo = dbc.Row([
+                dbc.Col(html.B(html.Label("Algorithm :")), width='auto'),
+                dbc.Col(dbc.Badge("" + a_name, pill=True, color="primary", className="mr-1"), width='auto')
+            ])
+
+            split = dbc.Row([
+                dbc.Col(html.B(html.Label("Split Ratio :")), width='auto'),
+                dbc.Col(dbc.Badge("" + str(s_ratio), pill=True, color="primary", className="mr-1"), width='auto')
+            ])
+
+            feature_badges = []
+            for i in f_columns:
+                feature_badges.append(dbc.Badge("" + i, pill=True, color="primary", className="mr-1"))
+
+            f_col = dbc.Row([
+                dbc.Col(html.B(html.Label("Feature columns :")), width='auto'),
+                dbc.Col(feature_badges, width='auto')
+            ])
+
+            t_col = dbc.Row([
+                dbc.Col(html.B(html.Label("Target Column :")), width='auto'),
+                dbc.Col(dbc.Badge("" + t_column.name, pill=True, color="primary", className="mr-1"), width='auto')
+            ])
+
+            return [algo], [split], [f_col], [t_col]
+        elif project.model.learning_type == "Unsupervised":
+            a_name = project.model.clusterer_name
+            f_columns = project.dataset.X
+
+            algo = dbc.Row([
             dbc.Col(html.B(html.Label("Algorithm :")), width='auto'),
             dbc.Col(dbc.Badge("" + a_name, pill=True, color="primary", className="mr-1"), width='auto')
-        ])
+            ])
 
-        split = dbc.Row([
-            dbc.Col(html.B(html.Label("Split Ratio :")), width='auto'),
-            dbc.Col(dbc.Badge("" + str(s_ratio), pill=True, color="primary", className="mr-1"), width='auto')
-        ])
+            feature_badges = []
+            for i in f_columns:
+                feature_badges.append(dbc.Badge("" + i, pill=True, color="primary", className="mr-1"))
 
-        feature_badges = []
-        for i in f_columns:
-            feature_badges.append(dbc.Badge("" + i, pill=True, color="primary", className="mr-1"))
-
-        f_col = dbc.Row([
+            f_col = dbc.Row([
             dbc.Col(html.B(html.Label("Feature columns :")), width='auto'),
             dbc.Col(feature_badges, width='auto')
-        ])
+            ])
 
-        t_col = dbc.Row([
-            dbc.Col(html.B(html.Label("Target Column :")), width='auto'),
-            dbc.Col(dbc.Badge("" + t_column.name, pill=True, color="primary", className="mr-1"), width='auto')
-        ])
-
-        return [algo], [split], [f_col], [t_col]
-
+            return [algo], [f_col]
 
 def create_hyperparameter_fields():
     if hasattr(project, 'model'):
@@ -355,11 +382,39 @@ def get_values(click, values, ids):
             set_params_response = project.model.set_params(output_dict)
             try:
                 if set_params_response == 1:
-                    a, b, c = project.model.model_train()
-                    print(a, b, c)
-                    return [html.B(html.Label("The Accuracy of the Model is " + str(a)))], \
-                           dash_table.DataTable(columns=[{"name": i, "id": i} for i in c],
-                                                data=c.to_dict('records'))
+                    if project.model.learning_type == "Supervised":
+                        a, b, c = project.model.model_train()
+                        print(a, b, c)
+                        return [html.B(html.Label("The Accuracy of the Model is " + str(a)))], \
+                               dash_table.DataTable(columns=[{"name": i, "id": i} for i in c],
+                                                    data=c.to_dict('records'))
+                    elif project.model.learning_type == "Unsupervised":
+                        labels = project.model.model_train()
+                        df = project.dataset.get_features()
+                        df['Assigned Cluster'] = labels
+                        """import plotly.express as px
+                        #https://machinelearningmastery.com/clustering-algorithms-with-python/
+                        X = project.dataset.get_features().to_numpy()
+                        yhat = project.model.clusterer.predict(X)
+                        clusters = unique(yhat)
+                        x_values, y_values = [],[]
+                        for cluster in clusters:
+                            row_ix = where(yhat == cluster)
+                            x_values.append(X[row_ix,0])
+                            y_values.append(X[row_ix,1])
+                        fig = px.scatter(x=x_values,y=y_values)
+                        dcc.Graph(figure=fig,style={'width':'100%','height':'100%')
+                        """
+                        return [html.B(html.Label("Model Fitting Complete"))], \
+                            dash_table.DataTable(columns=[{"name": i, "id": i} for i in df],
+                                                 data=df.to_dict('records'),
+                                                 css=[{'selector': '.row', 'rule': 'margin: 0'},
+                                                      {"selector": ".show-hide", "rule": "display: none"},
+                                                      {"selector": "input.current-page", "rule": "width: 50px"}],
+                                                 page_size=12,
+                                                 page_action="native",
+                                                 page_current=0,
+                                                 style_table={'overflowX': 'auto', 'display': 'block'})
                 else:
                     return html.Label(f"{set_params_response}"), html.Label('.')
             except Exception as e:
@@ -373,25 +428,30 @@ def get_values(click, values, ids):
 
 # Callback to set the learning type and algorithm name options
 @app.callback(
-    [Output("algorithm_name", "options"), Output("learning_type", "options")],
+    [Output("algorithm_name", "options"), Output("learning_type", "options"), Output("target_column","disabled"), Output("target_column", "value"), Output("split_ratio","disabled")],
     [Input('learning_type', 'value')])
 def update_learning_and_algorithm_list(value):
-    if value is None:
+    if value is None or value == "Supervised":
         return [[algorithm for algorithm in algorithms["Supervised"]],
-                [{"label": learning_type, "value": learning_type} for learning_type in learning_types]]
+                [{"label": learning_type, "value": learning_type} for learning_type in learning_types], False, None, False]
+    elif value == "Unsupervised":
+        return [
+            [algorithm for algorithm in algorithms[value]],
+            [{"label": learning_type, "value": learning_type} for learning_type in learning_types], True, None, True]
     else:
         return [
             [algorithm for algorithm in algorithms[value]],
-            [{"label": learning_type, "value": learning_type} for learning_type in learning_types]]
-
+            [{"label": learning_type, "value": learning_type} for learning_type in learning_types], no_update, no_update, no_update]
 
 # Callback to show the percentage of training and testing data based on the slider movement
 @app.callback(
     Output('split_ratio_value', 'children'),
-    [Input('split_ratio', 'value')])
-def update_output(value):
-    if value is not None:
+    [Input('split_ratio', 'value'), Input('split_ratio','disabled')])
+def update_output(value,state):
+    if value is not None and state is False:
         return 'Testing : {}% and Training : {}%'.format(value, 100 - value)
+    elif state is True:
+        return ''
     else:
         raise PreventUpdate
 
@@ -458,7 +518,6 @@ algorithms = {"Supervised":
     ],
     "Unsupervised":
         [
-            {"label": "KNN", "value": "1"},
-            {"label": "K-means", "value": "2"},
-            {"label": "Mean Shift", "value": "3"},
+            {"label": "K-means Clustering", "value": "KM"},
+            {"label": "Mean Shift Clustering", "value": "MS"},
         ]}

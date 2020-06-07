@@ -1,5 +1,6 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
+from sklearn.cluster import KMeans
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
@@ -56,13 +57,35 @@ class Model(object):
             }
     }
 
-    def __init__(self, app, dataset, name):
+    Clusterers = {'KM': 'KMeans'}
+    clusterer_params = {
+        'KMeans':
+        {
+            'n_clusters':
+            {
+                'default': 8,
+                'param_values': {'int': ['+']},
+                'tooltip_message': 'The number of clusters to form as well as the number of centroids to generate',
+                'link': 'https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html#sklearn.cluster.KMeans'
+            }
+        }
+    }
+
+    def __init__(self, app, dataset, type, name):
         self.app = app
         self.dataset = dataset
-        self.classifier_name = name
-        self.test_size = 0.2
-        self.classifier = eval(self.classifier_name)()  # https://stackoverflow.com/a/7719518
-        self.parameters = self.classfier_params[self.classifier_name]
+        self.learning_type = type
+
+        if self.learning_type == "Supervised":
+            self.classifier_name = name
+            self.test_size = 0.2
+            self.classifier = eval(self.classifier_name)()  # https://stackoverflow.com/a/7719518
+            self.parameters = self.classfier_params[self.classifier_name]
+        elif self.learning_type == "Unsupervised":
+            self.clusterer_name = name
+            self.clusterer = eval(self.clusterer_name)()
+            self.parameters = self.clusterer_params[self.clusterer_name]
+
         for param in self.parameters.values(): # Optimized further : https://stackoverflow.com/a/61380863/10155936
             param['current_value'] = param['default']
         self.app.logger.info("Model Instance created ")
@@ -142,7 +165,12 @@ class Model(object):
             processed_params, status = self.process_params(params)
             if status == 1:
                 processed_params['verbose'] = 100
-                self.classifier.set_params(**processed_params)
+                if self.learning_type == "Supervised":
+                    self.classifier.set_params(**processed_params)
+                elif self.learning_type == "Unsupervised":
+                    self.clusterer.set_params(**processed_params)
+                else:
+                    raise Exception
                 print(self.parameters)
                 return 1
             else:
@@ -164,13 +192,22 @@ class Model(object):
         return train_test_split(X, y, test_size=test_size, random_state=6)
 
     def model_train(self):
-        X_train, X_test, Y_train, Y_test = self.get_train_test_data(self.test_size)
-        self.app.logger.info("Training the model. Classifier : {}.".format(self.classifier))
-        self.classifier.fit(X_train, Y_train)
-        self.app.logger.info("Model Training done.")
-        predictions = self.classifier.predict(X_test)
-        acc_score,confusion,classify_report = self.compute_accuracy(predictions, Y_test)
-        return acc_score,confusion,classify_report
+        if self.learning_type == "Supervised":
+            X_train, X_test, Y_train, Y_test = self.get_train_test_data(self.test_size)
+            self.app.logger.info("Training the model. Classifier : {}.".format(self.classifier))
+            self.classifier.fit(X_train, Y_train)
+            self.app.logger.info("Model Training done.")
+            predictions = self.classifier.predict(X_test)
+            acc_score,confusion,classify_report = self.compute_accuracy(predictions, Y_test)
+            return acc_score,confusion,classify_report
+        elif self.learning_type == "Unsupervised":
+            self.app.logger.info(f"Model Fitting. Clusterer : {self.clusterer}")
+            kmeans = self.clusterer.fit(self.dataset.get_features())
+            self.app.logger.info("Model Fitting Complete")
+            return kmeans.labels_
+            # Show labels assigned to the dataset by updating the datatable
+        else :
+            self.app.logger.info("Learning type is not valid")
 
     def compute_accuracy(self, predictions, Y_test):
         acc_score = accuracy_score(Y_test, predictions)
