@@ -29,7 +29,7 @@ navbar = dbc.NavbarSimple(
     }
 )
 
-interpreter = html.Iframe(src="https://repl.it/repls/PurpleHeavyRuntimes?lite=true",
+interpreter = html.Iframe(src="http://localhost:5000",
             style={'width': "100%",
                    'height': "1000",
                    'frameborder': "0",

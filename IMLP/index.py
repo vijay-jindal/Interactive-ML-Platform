@@ -10,6 +10,8 @@ from apps import homepage, preprocess, eda, model
 from dash import no_update
 from dash.exceptions import PreventUpdate
 
+import os
+
 print(dcc.__version__)
 print(dbc.__version__)
 print(dash.__version__)
@@ -47,4 +49,7 @@ def display_page(pathname):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    try:
+        app.run_server(debug=True)
+    finally:
+        os.system('killall flask')
