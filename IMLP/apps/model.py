@@ -8,7 +8,7 @@ import traceback
 from dash.exceptions import PreventUpdate
 from dash import no_update
 
-#from numpy import unique, where
+from numpy import unique
 
 # Header bar
 navbar = dbc.NavbarSimple(
@@ -35,12 +35,28 @@ breakline = html.Br()
 # gif to show training info
 gif = html.Div("TRAINING RESULTS SHOWN HERE...", id='gif', style={'padding': '10px 30px 10px'})
 datatable = html.Div(id='tablex', style={'padding': '10px 30px 10px'})
+x_axis_dropdown = dcc.Dropdown(id='x_axis', searchable=False, placeholder="Select the X-Axis",
+                                       style=dict(
+                                           width='100%',
+                                           verticalAlign="middle"
+                                       ))
+y_axis_dropdown = dcc.Dropdown(id='y_axis', searchable=False, placeholder="Select the Y-Axis",
+                                       style=dict(
+                                           width='100%',
+                                           verticalAlign="middle"
+                                       ))
 
+clustering_graph = dcc.Graph(id='cluster-plot',style={'width':'100%','height':'50rem'})
+
+clustering_graph_div = html.Div(children=[x_axis_dropdown, y_axis_dropdown, clustering_graph],id='clustering_graph_div',style={'display':'none'})
+
+#
 # Cardbody component to compile dataset upload and view into single component
 gif_display = dbc.Card(
     dbc.CardBody(
-        [gif, datatable], style={'height': '57rem'}
-    ), outline=True, color="info"
+        [gif,datatable,breakline,clustering_graph_div], style={'height': '57rem'}
+    ), outline=True, color="info",style={'padding': '10px 25px 40px', 'height': '57rem','overflowY': 'scroll'}
+
 )
 
 start_training_btn = dbc.Button("Start Training", id='start_training', n_clicks=0, color='success',
@@ -183,6 +199,9 @@ model_page_contents = html.Div(children=[
     , id='save_download_model',style={'display': 'none'})
 ], style={
     'height': '80px', 'width': '330px'})
+
+xaxis_dropdown = dcc.Dropdown(id='xaxis')
+yaxis_dropdown = dcc.Dropdown(id='yaxis')
 
 # component to compile all the elements into single element
 layout = html.Div(
@@ -368,11 +387,18 @@ def create_hyperparameter_fields():
         return html.Div("Please Select the algorithm and dataset attributes.")
 
 
-@app.callback([Output('gif', 'children'), Output('tablex', 'children')],
-              [Input('start_training', 'n_clicks')],
+@app.callback([Output('gif', 'children'),
+               Output('tablex', 'children'),
+               Output('x_axis', 'options'),
+               Output('y_axis','options'),
+               Output('cluster-plot','figure'),
+               Output('clustering_graph_div','style')],
+              [Input('start_training', 'n_clicks'),
+               Input('x_axis','value'),
+               Input('y_axis','value')],
               [State({'type': 'hyperparameter', 'name': ALL}, 'value'),
                State({'type': 'hyperparameter', 'name': ALL}, 'id')])
-def get_values(click, values, ids):
+def get_values(click,x_axis,y_axis ,values, ids):
     if hasattr(project, 'model'):
         output = []
         if click > 0:
@@ -387,38 +413,43 @@ def get_values(click, values, ids):
                         print(a, b, c)
                         return [html.B(html.Label("The Accuracy of the Model is " + str(a)))], \
                                dash_table.DataTable(columns=[{"name": i, "id": i} for i in c],
-                                                    data=c.to_dict('records'))
+                                                    data=c.to_dict('records')), no_update,no_update,no_update, {'display':'none'}
                     elif project.model.learning_type == "Unsupervised":
                         labels = project.model.model_train()
                         df = project.dataset.get_features()
                         df['Assigned Cluster'] = labels
-                        """import plotly.express as px
-                        #https://machinelearningmastery.com/clustering-algorithms-with-python/
-                        X = project.dataset.get_features().to_numpy()
-                        yhat = project.model.clusterer.predict(X)
-                        clusters = unique(yhat)
-                        x_values, y_values = [],[]
-                        for cluster in clusters:
-                            row_ix = where(yhat == cluster)
-                            x_values.append(X[row_ix,0])
-                            y_values.append(X[row_ix,1])
-                        fig = px.scatter(x=x_values,y=y_values)
-                        dcc.Graph(figure=fig,style={'width':'100%','height':'100%')
-                        """
-                        return [html.B(html.Label("Model Fitting Complete"))], \
-                            dash_table.DataTable(columns=[{"name": i, "id": i} for i in df],
-                                                 data=df.to_dict('records'),
-                                                 css=[{'selector': '.row', 'rule': 'margin: 0'},
-                                                      {"selector": ".show-hide", "rule": "display: none"},
-                                                      {"selector": "input.current-page", "rule": "width: 50px"}],
-                                                 page_size=12,
-                                                 page_action="native",
-                                                 page_current=0,
-                                                 style_table={'overflowX': 'auto', 'display': 'block'})
+
+                        import plotly.graph_objects as go
+
+                        clusters = unique(df['Assigned Cluster'].to_numpy()) # get clusters from parameters of model
+                        fig = go.Figure()
+
+                        if x_axis is not None and y_axis is not None:
+                            for cluster in clusters:
+                                data = df[df["Assigned Cluster"] == cluster]
+                                fig.add_scatter(x=data[x_axis], y=data[y_axis], mode="markers", name=f"C{str(cluster)}")
+                            fig.update_layout(title="Clusters", xaxis_title=x_axis, yaxis_title=y_axis)
+                        else:
+                            for cluster in clusters:
+                                data = df[df["Assigned Cluster"] == cluster]
+                                fig.add_scatter(x=data[data.columns[0]], y=data[data.columns[1]], mode="markers",
+                                                name=f"C{str(cluster)}")
+                            fig.update_layout(title="Clusters", xaxis_title=data.columns[0], yaxis_title=data.columns[1])
+
+                        return [html.B(html.Label("Model Fitting Complete"))],dash_table.DataTable(columns=[{"name": i, "id": i} for i in df],
+                                         data=df.to_dict('records'),
+                                         css=[{'selector': '.row', 'rule': 'margin: 0'},
+                                              {"selector": ".show-hide", "rule": "display: none"},
+                                              {"selector": "input.current-page", "rule": "width: 50px"}],
+                                         page_size=12,
+                                         page_action="native",
+                                         page_current=0,
+                                         style_table={'overflowX': 'auto', 'display': 'block'}),[{'label': i, 'value': i} for i in df],[{'label': i, 'value': i} for i in df], fig, {'display': 'block'}
+
                 else:
-                    return html.Label(f"{set_params_response}"), html.Label('.')
+                    return html.Label(f"{set_params_response}"), html.Label('.'),no_update,no_update,no_update, {'display':'none'}
             except Exception as e:
-                return [html.B(html.Label("Training process failed : " + str(e)))], []
+                return [html.B(html.Label("Training process failed : " + str(e)))], [], no_update, no_update,no_update, {'display':'none'}
             traceback.print_exc()
         else:
             raise PreventUpdate
