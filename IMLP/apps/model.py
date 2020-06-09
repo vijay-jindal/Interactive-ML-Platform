@@ -411,9 +411,11 @@ def get_values(click,x_axis,y_axis ,values, ids):
                     if project.model.learning_type == "Supervised":
                         a, b, c = project.model.model_train()
                         print(a, b, c)
+                        c.insert(0, 'index', c.index)
                         return [html.B(html.Label("The Accuracy of the Model is " + str(a)))], \
                                dash_table.DataTable(columns=[{"name": i, "id": i} for i in c],
-                                                    data=c.to_dict('records')), no_update,no_update,no_update, {'display':'none'}
+                                                    data=c.to_dict('records'),
+                                                    style_cell={'textAlign': 'left'},), no_update,no_update,no_update, {'display':'none'}
                     elif project.model.learning_type == "Unsupervised":
                         labels = project.model.model_train()
                         df = project.dataset.get_features()

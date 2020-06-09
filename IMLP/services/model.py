@@ -113,22 +113,6 @@ class Model(object):
                         self.app.logger.info("Values of key '{}' saved.".format(key))
                         self.parameters[key]['current_value'] = params[key]
 
-                elif 'float' in types and params[key].replace('.','').isnumeric() and (params[key].count('.') == 1 or params[key].count('.') == 0) and special_character_regex.search(params[key]) is None:
-                    if '+' in self.parameters[key]['param_values']['float'] and float(params[key]) >= 0:
-                        params[key] = float(params[key])
-                        self.parameters[key]['current_value'] = params[key]
-                        self.app.logger.info(
-                            "Values of key '{}' changed from string {} to float {}".format(key, str(params[key]),
-                                                                                           params[key]))
-                    elif '-' in self.parameters[key]['param_values']['float'] and float(params[key]) <= 0:
-                        params[key] = float(params[key])
-                        self.parameters[key]['current_value'] = params[key]
-                        self.app.logger.info(
-                            "Values of key '{}' changed from string {} to float {}".format(key, str(params[key]),
-                                                                                           params[key]))
-                    else:
-                        bad_value.append(key)
-
                 elif 'int' in types and (params[key].lstrip("-").isnumeric() or params[key].lstrip("+").isnumeric()) and special_character_regex.search(params[key]) is None:
                     print(int(params[key]))
                     if '+' in self.parameters[key]['param_values']['int'] and int(params[key]) >= 0:
@@ -143,6 +127,22 @@ class Model(object):
                         self.app.logger.info(
                             "Values of key '{}' changed from string {} to int {}".format(key, str(params[key]),
                                                                                          params[key]))
+                    else:
+                        bad_value.append(key)
+                        
+                elif 'float' in types and params[key].replace('.','').isnumeric() and (params[key].count('.') == 1 or params[key].count('.') == 0) and special_character_regex.search(params[key]) is None:
+                    if '+' in self.parameters[key]['param_values']['float'] and float(params[key]) >= 0:
+                        params[key] = float(params[key])
+                        self.parameters[key]['current_value'] = params[key]
+                        self.app.logger.info(
+                            "Values of key '{}' changed from string {} to float {}".format(key, str(params[key]),
+                                                                                           params[key]))
+                    elif '-' in self.parameters[key]['param_values']['float'] and float(params[key]) <= 0:
+                        params[key] = float(params[key])
+                        self.parameters[key]['current_value'] = params[key]
+                        self.app.logger.info(
+                            "Values of key '{}' changed from string {} to float {}".format(key, str(params[key]),
+                                                                                           params[key]))
                     else:
                         bad_value.append(key)
 
