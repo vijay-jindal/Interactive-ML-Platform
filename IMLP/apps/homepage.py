@@ -2,7 +2,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
-
+import base64
 from app import app,project
 
 # Project name input modal
@@ -11,12 +11,12 @@ from dash.exceptions import PreventUpdate
 # Header bar
 navbar = dbc.NavbarSimple(
     brand="Interactive ML Platform",
-    brand_style={'font-size':'20px'},
+    brand_style={'font-size':'25px','textAlign':'center'},
     color="success",
     dark=True, style={
         'width': '100%',
-        'height': '7rem',
-        'text-size':'15px',
+        'height': '15rem',
+        'text-size':'20px',
         'verticalAlign': 'middle'
     }
 )
@@ -24,8 +24,10 @@ navbar = dbc.NavbarSimple(
 modal = dbc.Modal(
     [
         dbc.ModalHeader("Project Name"),
-        dbc.ModalBody([dbc.Input(id='project_name_input',placeholder="Enter Project Name",bs_size="lg",style={'font-size':'20px'},className="mb-3"),
-
+        dbc.ModalBody([dbc.Input(id='project_name_input',
+                                 placeholder="Enter Project Name",
+                                 autoComplete="off",
+                                 bs_size="lg",style={'font-size':'20px'},className="mb-3"),
                        ]),
         dbc.ModalFooter(
             [dcc.Link(dbc.Button("Create Project",disabled=True,
@@ -34,6 +36,11 @@ modal = dbc.Modal(
     ],size="lg",
     id="project_info_modal",
 )
+breakline = html.Br()
+# Component to show page footer
+page_footer = html.Div(children=[breakline, breakline, breakline],
+                       style={'position': 'fixed','left': 0, 'bottom': 0, 'width': '100%','background-color': 'green'
+})
 
 # component to compile all the elements into single element
 layout = html.Div(
@@ -41,17 +48,19 @@ layout = html.Div(
         dbc.Row(navbar),
         dbc.Col(
             [
-                dbc.Row(html.H2("This is an Interactive Machine Learning "
-                                    "Platform", id='project_description',
-                                    style={'align': 'center','width':'100%'})),
-                dbc.Row(dbc.Button("Create Project",className="mr-1",
-                                        id='create_project_btn',outline=True,color='success',size='lg',
-                                        style={'align': 'center','width':'100%'}, n_clicks=0)),
-                html.Br(),
-                dbc.Row(dbc.Button("Open Existing Project",className="mr-1",
-                                        id='open_project_btn',outline=True,color='success',size='lg',
-                                        style={'align': 'center','width':'100%'})),
+                dbc.Row([dbc.Col(),dbc.Col([
+                    dbc.Row(breakline),
+                    dbc.Row(dbc.Button("Create Project", className="mr-1",
+                                       id='create_project_btn', outline=True, color='success', size='lg',
+                                       style={'align': 'center', 'width': '100%'}, n_clicks=0)),
+                    html.Br(),
+                    dbc.Row(dbc.Button("Open Existing Project", className="mr-1",
+                                       id='open_project_btn', outline=True, color='success', size='lg',
+                                       style={'align': 'center', 'width': '100%'})),
+
+                ], width=7),dbc.Col()]),
                 dbc.Row(modal)],style={'padding': '10px 55px 20px','align':'center','width':'100%'}),
+                dbc.Row(page_footer)
     ])
 
 

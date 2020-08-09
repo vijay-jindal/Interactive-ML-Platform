@@ -387,7 +387,7 @@ def construct_toast(header, message, status):
         dismissable=True,
         icon=status,
         # top: 66 positions the toast below the navbar
-        style={"position": "fixed", "top": 66, "right": 10, "width": 350},
+        style={"position": "fixed", "top": 25, "right": 10, "width": 450, "font-size": '15px'},
     )
     return toast
 
@@ -772,10 +772,10 @@ def update_output(content, missing_clicks, apply_click, cancel_click, column_cli
     if component_clicked_id == "upload-data":
         project.upload_dataset(content, name),
         df = project.dataset.df.copy()
-        df_info = project.dataset.info()
+        df_info = project.dataset.df.columns
         return df.to_dict('records'), [{"name": i, "id": i} for i in df.columns], {
             'display': 'none'}, None, None, construct_toast("Dataset Info",
-                                                            "Dataset has been uploaded.\n {}".format(df_info),
+                                                            "Dataset has been uploaded.\n Columns : {}".format(df_info),
                                                             "info"), [], {'display': 'none'}, {'display': 'none'}, {
                    'display': 'none'}, False, False, False, {'display': 'none'}, {'display': 'none'}, {
                    'display': 'none'}, {'display': 'none'}, no_update, {'display': 'none'}, {'display': 'none'}, {
